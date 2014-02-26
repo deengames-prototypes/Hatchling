@@ -15,6 +15,10 @@ start = Time.new
 duration = Time.new - start
 draws = 0
 
+require 'win32/sound'
+include Win32
+Sound.play('assets/audio/beep.wav')
+
 while (duration <= 10) do
 	
 	for y in (0 .. 25) do
