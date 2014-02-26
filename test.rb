@@ -11,7 +11,7 @@ for n in (0 .. 15) do
 	Curses.init_pair(n, n, 1)
 	
 	Curses.attron(color_pair(n)|A_NORMAL){
-      Curses.addstr("#")
+		Curses.addstr("#")
     }
 end
 
