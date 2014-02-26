@@ -17,9 +17,12 @@ draws = 0
 
 require 'win32/sound'
 include Win32
-Sound.play('assets/audio/beep.wav')
 
-while (duration <= 10) do
+### Make sure everything is required by this point
+exit if defined?(Ocra)
+
+Sound.play('assets/audio/beep.wav')
+while (duration <= 3) do
 	
 	for y in (0 .. 25) do
 		for x in (0 .. 80) do
