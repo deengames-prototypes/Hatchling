@@ -1,18 +1,17 @@
 require_relative 'io/display'
+require_relative 'io/audio_manager'
 
 start = Time.new
 duration = Time.new - start
 draws = 0
 
 display = Display.new
-
-require 'win32/sound'
-include Win32
+audio = AudioManager.new
 
 ### Make sure all requires are called before this or the executable will crash
 exit if defined?(Ocra)
 
-Sound.play('assets/audio/beep.wav')
+audio.play('assets/audio/beep.wav')
 while (duration <= 3) do
 	
 	for y in (0 .. 25) do
