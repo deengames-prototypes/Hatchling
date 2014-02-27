@@ -1,8 +1,10 @@
-require 'win32/sound'
-include Win32
-
-class AudioManager
-	def play(sound_filename)
-		Sound.play(sound_filename)
+# TODO: centralize platform check and expose constant
+if RUBY_PLATFORM.include?('linux')
+	require_relative '../linux/audio_manager'
+	class AudioManager < LinuxAudioManager
+	end
+else
+	require_relative '../windows/audio_manager'
+	class AudioManager < WindowsAudioManager
 	end
 end

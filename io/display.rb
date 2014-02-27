@@ -7,11 +7,13 @@ class Display
 	def initialize
 		@@instance = self
 		
-		#ENV['TERM'] = 'xterm-256color'
+		ENV['TERM'] = 'xterm-256color'
 		Curses.noecho # do not show typed keys
 		Curses.init_screen		
 		Curses.start_color
-		
+
+		# TODO: penguins have 256 colors :O
+
 		for n in (0 .. Curses.colors) do
 			Curses.init_pair(n, n, 0)
 		end
