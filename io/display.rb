@@ -11,6 +11,7 @@ class Display
 		Curses.noecho # do not show typed keys
 		Curses.init_screen		
 		Curses.start_color
+		Curses.curs_set(0) # Hide cursor
 
 		# TODO: penguins have 256 colors :O
 
@@ -30,9 +31,29 @@ class Display
 				Curses.addstr(text)
 			end
 		}
+
+		Curses.setpos(3, 3) # Hack. Cursor on a wall shows the underlying tile; position elsewhere. This is despite hiding the cursor.
+	end
+	
+	def draw_map(map)
+		(0 .. map['width']).each do |x|
+			(0 .. map['height']).each do |y|
+				if map['perimeter'] == true && (x == 0 || y == 0 || x == map['width'] - 1 || y == map['height'] - 1) then
+					self.draw(x, y, '#')
+				else
+					self.draw(x, y, '.')
+				end
+			end
+		end
+
+		self.update
 	end
 	
 	def update
 		Curses.refresh
+	end
+
+	def destroy
+		Curses.close_screen
 	end
 end
