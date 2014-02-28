@@ -1,20 +1,31 @@
 require 'curses'
 include Curses
 
+require_relative('../windows/dos_color_strategy')
+require_relative('../linux/rgb_color_strategy')
+
 class Display
-	def initialize
-		@@instance = self
-		
-		ENV['TERM'] = 'xterm-256color'
+	def initialize		
+		ENV['TERM'] = 'xterm-256color' # Helps Linux only
 		Curses.noecho # do not show typed keys
 		Curses.init_screen		
 		Curses.start_color
 		Curses.curs_set(0) # Hide cursor
+		
+		if (Curses.cols < 80 || Curses.cols < 25) then
+			raise "Please resize your terminal to be at least 80x25 (currently, it's #{Curses.cols}x#{Curses.lines})"
+		end		
+		Curses.resizeterm(25, 80)
 
 		# TODO: penguins have 256 colors :O
-
 		for n in (0 .. Curses.colors) do
 			Curses.init_pair(n, n, 0)
+		end
+		
+		if (Curses.colors > 16)
+			@color_strategy = RgbColorStrategy.new(self)
+		else
+			@color_strategy = DosColorStrategy.new
 		end
 	end
 	
@@ -26,9 +37,10 @@ class Display
 		return 25
 	end
 	
-	# color = 0-15; defaults to grey 
-	def draw(x, y, text, color = 7)
-		Curses.attron(Curses.color_pair(color) | A_NORMAL) {
+	# Color = { :r => red, :g => green, :b => blue }
+	def draw(x, y, text, color)
+		color_index = @color_strategy.get_index_for(color)
+		Curses.attron(Curses.color_pair(color_index) | A_NORMAL) {
 			Curses.setpos(y, x)
 			# Seems like a small thing, but using characters is almost twice as fast
 			if (text.length <= 1) then
@@ -39,10 +51,15 @@ class Display
 		}		
 	end	
 	
+	def initialize_color(index, color)
+		# Map (0 .. 128) to (0 .. 1000) by multiplying by 8. Max is 1024, so round down.
+		Curses.init_color(index, [color.r * 8, 1000].min, [color.g * 8, 1000].min, [color.b * 8, 1000].min)
+	end
+	
 	def update
 		Curses.refresh
 	end
-
+	
 	def destroy
 		Curses.close_screen
 	end

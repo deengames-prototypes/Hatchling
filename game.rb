@@ -1,5 +1,6 @@
 require_relative 'system/display_system'
 require_relative 'io/audio_manager'
+require_relative 'io/color'
 require 'json'
 
 class Game
@@ -26,11 +27,13 @@ class Game
 			# Pass entities to our systems	
 			@display = DisplaySystem.new(@entities) # replace map with entities
 			audio = AudioManager.new() # Convert to audio System; pass entities
-			@display.fill_screen('.', 7)
+			@display.fill_screen('.', Color.new(128, 128, 128))
 			
-			while (true) do
+			quit = false
+			while (!quit) do
 				@display.draw
-				getch		
+				input = getch
+				quit = (input == 27) # 27 = ESC
 			end
 		rescue	
 			@display.destroy unless @display.nil?
@@ -40,6 +43,7 @@ class Game
 	
 	def create_entities_for(map)
 		entities = []
+		grey = Color.new(192, 192, 192)
 		
 		if map['perimeter'] == true
 			(0 .. map['width']).each do |x|
@@ -47,15 +51,21 @@ class Game
 				# Components = DisplayComponent(x, y, char, color)
 				# That's all data. There's no code here. Yet.
 				# (eg. move component for player can go in code/*.rb)
-				entities << { :display => { :x => x, :y => 0, :character => '#', :color => 7 } }
-				entities << { :display => { :x => x, :y => map['height'] - 1, :character => '#', :color => 7 } }
+				
+				# TODO: we have some common entities (eg. walls) and components (eg. display), irrespective of game content
+				# TODO: move this into a standard place for construction
+				entities << { :display => { :x => x, :y => 0, :character => '#', :color => grey } }
+				entities << { :display => { :x => x, :y => map['height'] - 1, :character => '#', :color => grey } }
 			end
 			
 			(0 .. map['height']).each do |y|
-				entities << { :display => { :x => 0, :y => y, :character => '#', :color => 7 } }
-				entities << { :display => { :x => map['width'] - 1, :y => y, :character => '#', :color => 7 } }
+				entities << { :display => { :x => 0, :y => y, :character => '#', :color => grey } }
+				entities << { :display => { :x => map['width'] - 1, :y => y, :character => '#', :color => grey } }
 			end
 		end
+		
+		entities << { :display => { :x => 3, :y => 3, :character => '@', :color => Color.new(0, 255, 0) } }
+		entities << { :display => { :x => 7, :y => 4, :character => 'm', :color => Color.new(255, 0, 0) } }
 		
 		return entities
 	end
