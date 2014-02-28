@@ -35,6 +35,7 @@ class Display
 		Curses.setpos(3, 3) # Hack. Cursor on a wall shows the underlying tile; position elsewhere. This is despite hiding the cursor.
 	end
 	
+	# TODO: I need the player, so I know what to draw around.
 	def draw_map(map)
 		(0 .. map['width']).each do |x|
 			(0 .. map['height']).each do |y|
