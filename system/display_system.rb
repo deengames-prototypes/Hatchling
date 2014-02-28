@@ -12,6 +12,19 @@ class DisplaySystem
 	end
 
 	def draw
-		@display.draw_map(@entities)
+		@entities.each do |e|
+			if !e[:display].nil?
+				component = e[:display]
+				@display.draw(component[:x], component[:y], component[:character], component[:color])
+			end
+		end
+	end
+	
+	def fill_screen(character, color)
+		(0 .. @display.width).each do |x|
+			(0 .. @display.height).each do |y|
+				@display.draw(x, y, character, color)
+			end
+		end
 	end
 end

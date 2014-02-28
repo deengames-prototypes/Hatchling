@@ -1,2 +1,2 @@
 require_relative 'game'
-game = Game.new.start
+Game.new.start

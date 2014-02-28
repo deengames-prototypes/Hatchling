@@ -2,8 +2,6 @@ require 'curses'
 include Curses
 
 class Display
-	@@instance = nil
-	
 	def initialize
 		@@instance = self
 		
@@ -20,6 +18,14 @@ class Display
 		end
 	end
 	
+	def width
+		return 80
+	end
+	
+	def height
+		return 25
+	end
+	
 	# color = 0-15; defaults to grey 
 	def draw(x, y, text, color = 7)
 		Curses.attron(Curses.color_pair(color) | A_NORMAL) {
@@ -30,25 +36,8 @@ class Display
 			else 
 				Curses.addstr(text)
 			end
-		}
-
-		Curses.setpos(3, 3) # Hack. Cursor on a wall shows the underlying tile; position elsewhere. This is despite hiding the cursor.
-	end
-	
-	# TODO: I need the player, so I know what to draw around.
-	def draw_map(map)
-		(0 .. map['width']).each do |x|
-			(0 .. map['height']).each do |y|
-				if map['perimeter'] == true && (x == 0 || y == 0 || x == map['width'] - 1 || y == map['height'] - 1) then
-					self.draw(x, y, '#')
-				else
-					self.draw(x, y, '.')
-				end
-			end
-		end
-
-		self.update
-	end
+		}		
+	end	
 	
 	def update
 		Curses.refresh

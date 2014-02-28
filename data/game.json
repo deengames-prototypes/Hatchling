@@ -1,0 +1,7 @@
+{
+	"components": [
+		{ "DisplayComponent":	["x", "y", "character", "color"] }
+	],
+	
+	"starting_map": "town.json"
+}
