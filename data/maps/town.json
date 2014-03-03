@@ -1,5 +1,13 @@
 {
 	"perimeter": true,
 	"width": 80,
-	"height": 25
+	"height": 25,
+	
+	"stairs": {
+		"x": 40,
+		"y": 12
+	},
+	
+	"startX": "40",
+	"startY": "16"
 }

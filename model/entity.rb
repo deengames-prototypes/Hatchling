@@ -11,7 +11,7 @@ class Entity
 		return @properties.has_key?(key)
 	end
 	
-	def add_all(hash)
+	def add(hash)
 		hash.each do |key|
 			@properties[key] = hash[key]
 		end

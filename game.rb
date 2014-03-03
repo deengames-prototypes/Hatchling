@@ -23,7 +23,7 @@ class Game
 			
 			# Load the starting map.
 			start_map = JSON.parse(File.read("data/maps/#{game_data['starting_map']}"))
-			@entities = create_entities_for(start_map)
+			@entities = create_entities_for(start_map)			
 			
 			# Pass entities to our systems	
 			@display = DisplaySystem.new(@entities) # replace map with entities
@@ -66,8 +66,12 @@ class Game
 			end
 		end
 		
-		entities << Entity.new({ :x => 3, :y => 3, :character => '@', :color => Color.new(0, 192, 0) })
-		entities << Entity.new({ :x => 7, :y => 4, :character => 'b', :color => Color.new(255, 0, 0) })
+		if !map['stairs'].nil? then			
+			entities << Entity.new({ :x => map['stairs']['x'], :y => map['stairs']['y'], :character => ">", :color => Color.new(225, 225, 225) })			
+		end
+		
+		player = Entity.new({:x => map['startX'].to_i, :y => map['startY'].to_i, :character => "@", :color => Color.new(255, 255, 255) })
+		entities << player
 		
 		return entities
 	end
