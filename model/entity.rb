@@ -1,28 +1,26 @@
+# Some sort of dynamic object, like C#'s ExpandoObject, or like OpenStruct.
+# It has a few mor handy methods, like has?(property) and add_all(hash)
 class Entity
 
-	attr_reader :components
+	def initialize(hash)
+		@properties = hash
+	end
 	
-	def initialize(components)
-		if components.nil? then
-			@components = {}
-		else
-			@components = components
+	def has?(key)
+		return @properties.has_key?(key)
+	end
+	
+	def add_all(hash)
+		hash.each do |key|
+			@properties[key] = hash[key]
 		end
 	end
 	
-	def add_component(key, value)
-		if @components.has_key?(key)
-			raise "Trying to add component #{key}/#{component} to #{self} when it's already a component!"
+	def method_missing(name, *args)
+		if self.has?(name)
+			return @properties[name]
 		else
-			@components[key] = value
+			raise "There's no #{name} property defined on #{self}"
 		end
-	end
-	
-	def remove_component(key)
-		@components.delete(key)
-	end
-	
-	def get(key)
-		return @components[key]
 	end
 end

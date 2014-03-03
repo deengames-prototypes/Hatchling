@@ -3,7 +3,6 @@ require_relative 'io/audio_manager'
 require_relative 'model/color'
 require_relative 'model/entity'
 require 'json'
-require_relative 'component/display_component'
 
 class Game
 
@@ -52,22 +51,23 @@ class Game
 				# NOT classes. Wall is a bunch of components and data.
 				# Components = DisplayComponent(x, y, char, color)
 				# That's all data. There's no code here. Yet.
-				# (eg. move component for player can go in code/*.rb)
+				# Old-style would be to have a MoveComponent instance in Player entity.
+				# NewStyle is an empty "move" tag in the entity, and the MoveSystem operates on that.
 				
 				# TODO: we have some common entities (eg. walls) and components (eg. display), irrespective of game content
 				# TODO: move this into a standard place for construction
-				entities << Entity.new({ :display => DisplayComponent.new(x, 0, '#', grey )})
-				entities << Entity.new({ :display => DisplayComponent.new(x, map['height'] - 1, '#', grey )})
+				entities << Entity.new({ :x => x, :y => 0, :character => '#', :color => grey })
+				entities << Entity.new({ :x => x, :y => map['height'] - 1, :character => '#', :color => grey })
 			end
 			
 			(0 .. map['height']).each do |y|
-				entities << Entity.new({ :display => DisplayComponent.new(0, y, '#', grey )})
-				entities << Entity.new({ :display => DisplayComponent.new(map['width'] - 1, y, '#', grey )})
+				entities << Entity.new({ :x => 0, :y => y, :character => '#', :color => grey })
+				entities << Entity.new({ :x => map['width'] - 1, :y => y, :character => '#', :color => grey })
 			end
 		end
 		
-		entities << Entity.new({ :display => DisplayComponent.new(3, 3, '@', Color.new(0, 255, 0) )})
-		entities << Entity.new({ :display => DisplayComponent.new(7, 4, 'm', Color.new(255, 0, 0) )})
+		entities << Entity.new({ :x => 3, :y => 3, :character => '@', :color => Color.new(0, 192, 0) })
+		entities << Entity.new({ :x => 7, :y => 4, :character => 'b', :color => Color.new(255, 0, 0) })
 		
 		return entities
 	end

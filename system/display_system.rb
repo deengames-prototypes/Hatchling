@@ -12,10 +12,9 @@ class DisplaySystem
 	end
 
 	def draw
-		@entities.each do |e|
-			if !e.get(:display).nil?
-				component = e.get(:display)
-				@display.draw(component.x, component.y, component.character, component.color)
+		@entities.each do |e|			
+			if e.has?(:character) && e.has?(:color)
+				@display.draw(e.x, e.y, e.character, e.color)
 			end
 		end
 	end
