@@ -1,4 +1,4 @@
-require_relative '../io/color'
+require_relative '../model/color'
 
 class DosColorStrategy	
 

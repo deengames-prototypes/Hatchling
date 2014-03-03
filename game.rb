@@ -1,7 +1,9 @@
 require_relative 'system/display_system'
 require_relative 'io/audio_manager'
-require_relative 'io/color'
+require_relative 'model/color'
+require_relative 'model/entity'
 require 'json'
+require_relative 'component/display_component'
 
 class Game
 
@@ -54,18 +56,18 @@ class Game
 				
 				# TODO: we have some common entities (eg. walls) and components (eg. display), irrespective of game content
 				# TODO: move this into a standard place for construction
-				entities << { :display => { :x => x, :y => 0, :character => '#', :color => grey } }
-				entities << { :display => { :x => x, :y => map['height'] - 1, :character => '#', :color => grey } }
+				entities << Entity.new({ :display => DisplayComponent.new(x, 0, '#', grey )})
+				entities << Entity.new({ :display => DisplayComponent.new(x, map['height'] - 1, '#', grey )})
 			end
 			
 			(0 .. map['height']).each do |y|
-				entities << { :display => { :x => 0, :y => y, :character => '#', :color => grey } }
-				entities << { :display => { :x => map['width'] - 1, :y => y, :character => '#', :color => grey } }
+				entities << Entity.new({ :display => DisplayComponent.new(0, y, '#', grey )})
+				entities << Entity.new({ :display => DisplayComponent.new(map['width'] - 1, y, '#', grey )})
 			end
 		end
 		
-		entities << { :display => { :x => 3, :y => 3, :character => '@', :color => Color.new(0, 255, 0) } }
-		entities << { :display => { :x => 7, :y => 4, :character => 'm', :color => Color.new(255, 0, 0) } }
+		entities << Entity.new({ :display => DisplayComponent.new(3, 3, '@', Color.new(0, 255, 0) )})
+		entities << Entity.new({ :display => DisplayComponent.new(7, 4, 'm', Color.new(255, 0, 0) )})
 		
 		return entities
 	end

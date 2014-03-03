@@ -13,9 +13,9 @@ class DisplaySystem
 
 	def draw
 		@entities.each do |e|
-			if !e[:display].nil?
-				component = e[:display]
-				@display.draw(component[:x], component[:y], component[:character], component[:color])
+			if !e.get(:display).nil?
+				component = e.get(:display)
+				@display.draw(component.x, component.y, component.character, component.color)
 			end
 		end
 	end
