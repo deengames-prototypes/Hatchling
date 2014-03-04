@@ -2,7 +2,7 @@ require_relative 'system/display_system'
 require_relative 'system/input_system'
 require_relative 'io/audio_manager'
 require_relative 'io/keys'
-require_relative 'model/color'
+require_relative 'utils/color'
 require_relative 'model/entity'
 require_relative 'component/process_input'
 require 'json'
@@ -72,14 +72,14 @@ class Game
 		end
 		
 		if !map['stairs'].nil? then
-			entities << Entity.new({ :x => map['stairs']['x'], :y => map['stairs']['y'], :character => ">", :color => Color.new(225, 225, 225) })			
+			entities << Entity.new({ :x => map['stairs']['x'], :y => map['stairs']['y'], :character => ">", :color => Color.new(255, 255, 255) })			
 		end
 		
 		player = Entity.new({
 			# For debugging
 			:name => 'Player',
 			# Display properties
-			:x => map['startX'].to_i, :y => map['startY'].to_i, :character => "@", :color => Color.new(255, 255, 255)
+			:x => map['startX'].to_i, :y => map['startY'].to_i, :character => "@", :color => Color.new(255, 128, 0)
 		})
 		
 		player.add({:process_input => ProcessInput.new(lambda { |input| 

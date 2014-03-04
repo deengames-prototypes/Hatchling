@@ -1,4 +1,4 @@
-require_relative '../model/color'
+require_relative '../utils/color'
 
 class DosColorStrategy	
 
@@ -39,7 +39,8 @@ class DosColorStrategy
 			
 			(1..@colors.size - 1).each do |c|
 				distance = compute_distance(color, @colors[c])
-				if (distance < min_distance)
+				# <=: favour bright colours
+				if (distance <= min_distance)
 					min_distance = distance
 					match = c
 				end

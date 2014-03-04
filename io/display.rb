@@ -1,9 +1,11 @@
+require_relative '../utils/logger'
 require 'curses'
 include Curses
 
 require_relative('../windows/dos_color_strategy')
 require_relative('../linux/rgb_color_strategy')
 
+# Wrapper around the display API (currently Curses)
 class Display
 	def initialize		
 		ENV['TERM'] = 'xterm-256color' # Helps Linux only
@@ -13,7 +15,8 @@ class Display
 		Curses.stdscr.keypad(true) # Trap arrow keys
 		Curses.curs_set(0) # Hide cursor
 		
-		if (Curses.cols < 80 || Curses.cols < 25) then
+		Logger.info("Running at #{Curses.cols}x#{Curses.lines} with #{Curses.colors} colours")
+		if (Curses.cols < 80 || Curses.lines < 25) then
 			raise "Please resize your terminal to be at least 80x25 (currently, it's #{Curses.cols}x#{Curses.lines})"
 		end		
 		Curses.resizeterm(25, 80)

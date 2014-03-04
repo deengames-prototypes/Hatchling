@@ -6,4 +6,8 @@ class Color
 		@g = g
 		@b = b
 	end
+	
+	def to_s
+		"Color (#{@r}, #{@g}, #{@b})"
+	end
 end
