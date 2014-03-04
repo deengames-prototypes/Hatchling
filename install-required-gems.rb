@@ -1,6 +1,6 @@
 # This installs all gems required to run the game.
 # Currently, there are none :)
-required = ['json']
+required = ['json', 'logging']
 
 required.each do |gem|
 	puts "Installing #{gem} ..."
