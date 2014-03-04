@@ -1,5 +1,7 @@
 require_relative 'system/display_system'
+require_relative 'system/input_system'
 require_relative 'io/audio_manager'
+require_relative 'io/keys'
 require_relative 'model/color'
 require_relative 'model/entity'
 require 'json'
@@ -27,14 +29,17 @@ class Game
 			
 			# Pass entities to our systems	
 			@display = DisplaySystem.new(@entities) # replace map with entities
+			@input = InputSystem.new(@entities)
+			
 			audio = AudioManager.new() # Convert to audio System; pass entities
 			@display.fill_screen('.', Color.new(128, 128, 128))
 			
 			quit = false
 			while (!quit) do
 				@display.draw
-				input = getch
-				quit = (input == 27) # 27 = ESC
+				input = @input.get_and_process_input
+				quit = (input == 'q' || input == 'escape')
+				puts "key: #{input}"
 			end
 		rescue	
 			@display.destroy unless @display.nil?

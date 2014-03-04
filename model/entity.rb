@@ -3,12 +3,17 @@
 # It has a few mor handy methods, like has?(property) and add_all(hash)
 class Entity
 
-	def initialize(hash)
+	def initialize(hash, tags = [])
 		@properties = hash
+		@tags = tags
 	end
 	
 	def has?(key)
 		return @properties.has_key?(key)
+	end
+	
+	def has_tag?(tag)
+		return @tags.include?(tag)
 	end
 	
 	def add(hash)
