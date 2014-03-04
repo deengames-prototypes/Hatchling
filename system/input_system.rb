@@ -12,8 +12,8 @@ class InputSystem
 		input = Keys.read_character
 		
 		@entities.each do |e|
-			if e.has_tag?(:input)
-				e.process_input(input)
+			if e.has?(:process_input)				
+				e.process_input.process(input)
 			end
 		end
 		

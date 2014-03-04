@@ -10,6 +10,7 @@ class Display
 		Curses.noecho # do not show typed keys
 		Curses.init_screen		
 		Curses.start_color
+		Curses.stdscr.keypad(true) # Trap arrow keys
 		Curses.curs_set(0) # Hide cursor
 		
 		if (Curses.cols < 80 || Curses.cols < 25) then

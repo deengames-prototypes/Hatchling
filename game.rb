@@ -4,6 +4,7 @@ require_relative 'io/audio_manager'
 require_relative 'io/keys'
 require_relative 'model/color'
 require_relative 'model/entity'
+require_relative 'component/process_input'
 require 'json'
 
 class Game
@@ -38,8 +39,7 @@ class Game
 			while (!quit) do
 				@display.draw
 				input = @input.get_and_process_input
-				quit = (input == 'q' || input == 'escape')
-				puts "key: #{input}"
+				quit = (input == 'q' || input == 'escape')				
 			end
 		rescue	
 			@display.destroy unless @display.nil?
@@ -71,11 +71,29 @@ class Game
 			end
 		end
 		
-		if !map['stairs'].nil? then			
+		if !map['stairs'].nil? then
 			entities << Entity.new({ :x => map['stairs']['x'], :y => map['stairs']['y'], :character => ">", :color => Color.new(225, 225, 225) })			
 		end
 		
-		player = Entity.new({:x => map['startX'].to_i, :y => map['startY'].to_i, :character => "@", :color => Color.new(255, 255, 255) })
+		player = Entity.new({
+			# For debugging
+			:name => 'Player',
+			# Display properties
+			:x => map['startX'].to_i, :y => map['startY'].to_i, :character => "@", :color => Color.new(255, 255, 255)
+		})
+		
+		player.add({:process_input => ProcessInput.new(lambda { |input| 
+			if (input == 'up') then
+				player.y -= 1
+			elsif (input == 'down') then
+				player.y += 1
+			elsif (input == 'left') then
+				player.x -= 1
+			elsif (input == 'right')
+				player.x += 1
+			end
+		} )})		
+		
 		entities << player
 		
 		return entities
