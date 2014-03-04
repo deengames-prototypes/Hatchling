@@ -4,7 +4,6 @@ require_relative 'io/audio_manager'
 require_relative 'io/keys'
 require_relative 'utils/color'
 require_relative 'model/entity'
-require_relative 'component/process_input'
 require 'json'
 
 class Game
@@ -27,10 +26,11 @@ class Game
 			# Load the starting map.
 			start_map = JSON.parse(File.read("data/maps/#{game_data['starting_map']}"))
 			@entities = create_entities_for(start_map)			
+			player = @entities.find { |e| e.has?(:name) && e.name == 'Player' }
 			
 			# Pass entities to our systems	
 			@display = DisplaySystem.new(@entities) # replace map with entities
-			@input = InputSystem.new(@entities)
+			@input = InputSystem.new(player)
 			
 			audio = AudioManager.new() # Convert to audio System; pass entities
 			@display.fill_screen('.', Color.new(128, 128, 128))
@@ -41,7 +41,7 @@ class Game
 				input = @input.get_and_process_input
 				quit = (input == 'q' || input == 'escape')				
 			end
-		rescue	
+		rescue
 			@display.destroy unless @display.nil?
 			raise # Re-raise after cleaning up
 		end
@@ -81,18 +81,6 @@ class Game
 			# Display properties
 			:x => map['startX'].to_i, :y => map['startY'].to_i, :character => "@", :color => Color.new(255, 128, 0)
 		})
-		
-		player.add({:process_input => ProcessInput.new(lambda { |input| 
-			if (input == 'up') then
-				player.y -= 1
-			elsif (input == 'down') then
-				player.y += 1
-			elsif (input == 'left') then
-				player.x -= 1
-			elsif (input == 'right')
-				player.x += 1
-			end
-		} )})		
 		
 		entities << player
 		
