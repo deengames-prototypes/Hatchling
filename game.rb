@@ -79,7 +79,7 @@ class Game
 			# For debugging
 			:name => 'Player',
 			# Display properties
-			:x => map['startX'].to_i, :y => map['startY'].to_i, :character => "@", :color => Color.new(255, 128, 0)
+			:x => map['startX'].to_i, :y => map['startY'].to_i, :character => "@", :color => Color.new(255, 192, 32)
 		})
 		
 		entities << player

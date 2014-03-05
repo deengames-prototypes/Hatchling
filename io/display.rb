@@ -56,8 +56,8 @@ class Display
 	end	
 	
 	def initialize_color(index, color)
-		# Map (0 .. 128) to (0 .. 1000) by multiplying by 8. Max is 1024, so round down.
-		Curses.init_color(index, [color.r * 8, 1000].min, [color.g * 8, 1000].min, [color.b * 8, 1000].min)
+		# Map (0 .. 255) to (0 .. 1000) by multiplying by 4. Max is 1020, so round down.
+		Curses.init_color(index, [color.r * 4, 1000].min, [color.g * 4, 1000].min, [color.b * 4, 1000].min)
 	end
 	
 	def update
