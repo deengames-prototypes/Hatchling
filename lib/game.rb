@@ -18,7 +18,18 @@ class Game
 			exit if defined?(Ocra)
 			
 			# Load the game.
+			if (!File.exists?('data/game.json')) then
+				raise 'Missing main game definition file: data/game.json'
+			end
+			
 			game_data = JSON.parse(File.read('data/game.json'))
+			if game_data['starting_map'].nil?
+				raise 'Game definition is missing a starting map ("starting_map" property); please tell it which map to start on.'
+			end
+			
+			if (!File.exists?("data/maps/#{game_data['starting_map']}"))
+				raise "Starting map (data/maps/#{game_data['starting_map']}) seems to be missing."
+			end
 			
 			# Load entitiy/component definitions			
 			@component_definitions = game_data['components']
