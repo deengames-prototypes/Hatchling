@@ -40,9 +40,17 @@ class Game
 			
 			audio = AudioManager.new() # Convert to audio System; pass entities
 			
+			### Draw the titlescreen ###
 			@display.draw_text(35, 10, game_data['name'].upcase, Color.new(255, 0, 0))
 			@display.draw_text(30, 12, 'Press any key to begin.', Color.new(255, 255, 255))
 			@input.get_input
+			
+			### Draw the story ###
+			if (!game_data['story'].nil?) then
+				@display.clear				
+				@display.draw_text(0, 0, game_data['story'], Color.new(192, 192, 192))
+				@input.get_input
+			end
 			
 			# Start drawing the main map
 			@display.fill_screen('.', Color.new(128, 128, 128))
