@@ -5,7 +5,7 @@ class Logger
 		@@logger = Logging.logger['main']
 		@@logger.add_appenders(
 			#Logging.appenders.stdout,
-			Logging.appenders.file('chrysalis.log')
+			Logging.appenders.file('hatchling.log')
 		)
 		@@logger.level = :info
 	end
