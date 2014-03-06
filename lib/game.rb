@@ -53,7 +53,15 @@ class Game
 			end
 			
 			# Start drawing the main map
-			@display.fill_screen('.', Color.new(128, 128, 128))
+			@display.fill_screen('.', Color.new(128, 128, 128))			
+			if (!start_map['walls'].nil?) then				
+				white = Color.new(255, 255, 255)
+				start_map['walls'].each do |w|
+					@entities << Entity.new({ :x => w[0], :y => w[1], :character => "#", :color => white })
+				end
+			end
+			
+			@display.draw
 			
 			quit = false
 			while (!quit) do
@@ -96,7 +104,7 @@ class Game
 		end
 		
 		player = Entity.new({
-			# For debugging
+			# For identification
 			:name => 'Player',
 			# Display properties
 			:x => map['startX'].to_i, :y => map['startY'].to_i, :character => "@", :color => Color.new(255, 192, 32)
