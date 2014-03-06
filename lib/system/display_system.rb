@@ -29,6 +29,10 @@ class DisplaySystem
 		end		
 	end
 	
+	def draw_text(x, y, text, color)
+		@display.draw(x, y, text, color)
+	end
+	
 	def fill_screen(character, color)
 		(0 .. @display.width).each do |x|
 			(0 .. @display.height).each do |y|

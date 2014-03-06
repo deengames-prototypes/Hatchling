@@ -1,16 +1,14 @@
 require 'logging'
 
 class Logger
-	def self.init
+	def self.init(filename)
 		@@logger = Logging.logger['main']
 		@@logger.add_appenders(
 			#Logging.appenders.stdout,
-			Logging.appenders.file('hatchling.log')
+			Logging.appenders.file("#{filename}.log")
 		)
 		@@logger.level = :info
 	end
-	
-	init
 	
 	def self.info(message)
 		message = annotate(message)

@@ -7,6 +7,10 @@ class InputSystem
 	def destroy		
 	end
 
+	def get_input
+		Keys.read_character
+	end
+	
 	def get_and_process_input		
 		input = Keys.read_character
 		

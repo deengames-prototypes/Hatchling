@@ -15,12 +15,7 @@ class Game
 	def start
 		begin
 			### Make sure all requires are called before this or the executable will crash			
-			exit if defined?(Ocra)
-			
-			# Load the game.
-			if (!File.exists?('data/game.json')) then
-				raise 'Missing main game definition file: data/game.json'
-			end
+			exit if defined?(Ocra)			
 			
 			game_data = JSON.parse(File.read('data/game.json'))
 			if game_data['starting_map'].nil?
@@ -44,6 +39,12 @@ class Game
 			@input = InputSystem.new(player)
 			
 			audio = AudioManager.new() # Convert to audio System; pass entities
+			
+			@display.draw_text(35, 10, game_data['name'].upcase, Color.new(255, 0, 0))
+			@display.draw_text(30, 12, 'Press any key to begin.', Color.new(255, 255, 255))
+			@input.get_input
+			
+			# Start drawing the main map
 			@display.fill_screen('.', Color.new(128, 128, 128))
 			
 			quit = false
