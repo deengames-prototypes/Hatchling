@@ -38,7 +38,16 @@ class InputSystem
 		map = Game.instance.current_map
 		player = @player
 		
-		#if (x < 0 || x >= map.width 
+		return false if (x < 0 || x >= map.width || y < 0 || y >= map.height)
+		# TODO: should be a real entity with x/y properties
+		map.walls.each do |wall|
+			return false if x == wall[0] && y == wall[1]
+		end
+		
+		map.npcs.each do |npc|
+			return false if x == npc['x'] && y == npc['y']
+		end		
+		
 		return true
 	end
 end
