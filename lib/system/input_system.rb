@@ -1,10 +1,12 @@
+require 'ostruct'
+
 class InputSystem	
 
 	def initialize(player)
 		@player = player
 	end	
 	
-	def destroy		
+	def destroy
 	end
 
 	def get_input
@@ -13,7 +15,7 @@ class InputSystem
 	
 	def get_and_process_input		
 		input = Keys.read_character
-		target = { x: @player.x, y: @player.y }
+		target = OpenStruct.new({ x: @player.x, y: @player.y })
 		if (input == 'up') then
 			target.y -= 1
 		elsif (input == 'down') then
@@ -33,7 +35,7 @@ class InputSystem
 	end
 	
 	def is_movable?(x, y)
-		map = Game.current_map
+		map = Game.instance.current_map
 		player = @player
 		
 		#if (x < 0 || x >= map.width 
