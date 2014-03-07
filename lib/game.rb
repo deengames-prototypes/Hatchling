@@ -43,7 +43,7 @@ class Game
 			
 			# Pass entities to our systems	
 			@display = DisplaySystem.new(@entities) # replace map with entities
-			@input = InputSystem.new(player)
+			@input = InputSystem.new(@entities, player)
 			
 			audio = AudioManager.new() # Convert to audio System; pass entities
 			
@@ -60,14 +60,7 @@ class Game
 			end
 			
 			# Start drawing the main map
-			@display.fill_screen('.', Color.new(128, 128, 128))			
-			if (!@current_map.walls.nil?) then				
-				white = Color.new(255, 255, 255)
-				@current_map.walls.each do |w|
-					@entities << Entity.new({ :x => w[0], :y => w[1], :character => "#", :color => white })
-				end
-			end
-			
+			@display.fill_screen('.', Color.new(128, 128, 128))
 			@display.draw
 			
 			quit = false
@@ -115,6 +108,13 @@ class Game
 				npc = OpenStruct.new(npc)
 				entities << Entity.new({ :x => npc.x, :y => npc.y, :character => '@',
 				:color => Color.new(npc.color['r'], npc.color['g'], npc.color['b'])})
+			end
+		end
+		
+		if (!map.walls.nil?) then				
+			white = Color.new(255, 255, 255)
+			map.walls.each do |w|
+				entities << Entity.new({ :x => w[0], :y => w[1], :character => "#", :color => white })
 			end
 		end
 		

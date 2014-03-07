@@ -2,8 +2,9 @@ require 'ostruct'
 
 class InputSystem	
 
-	def initialize(player)
+	def initialize(entities, player)
 		@player = player
+		@entities = entities
 	end	
 	
 	def destroy
@@ -40,14 +41,9 @@ class InputSystem
 		
 		return false if map.perimeter == true && (x == 0 || x == map.width - 1 || y == 0 || y == map.height - 1)
 		return false if (x < 0 || x >= map.width || y < 0 || y >= map.height)
-		
-		# TODO: should be a real entity with x/y properties
-		map.walls.each do |wall|
-			return false if x == wall[0] && y == wall[1]
-		end
-		
-		map.npcs.each do |npc|
-			return false if x == npc['x'] && y == npc['y']
+				
+		@entities.each do |e|
+			return false if x == e.x && y == e.y
 		end		
 		
 		return true
