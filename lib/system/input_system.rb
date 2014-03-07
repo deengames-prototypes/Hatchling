@@ -38,7 +38,9 @@ class InputSystem
 		map = Game.instance.current_map
 		player = @player
 		
+		return false if map.perimeter == true && (x == 0 || x == map.width - 1 || y == 0 || y == map.height - 1)
 		return false if (x < 0 || x >= map.width || y < 0 || y >= map.height)
+		
 		# TODO: should be a real entity with x/y properties
 		map.walls.each do |wall|
 			return false if x == wall[0] && y == wall[1]
