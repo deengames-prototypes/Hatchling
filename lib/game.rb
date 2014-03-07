@@ -103,12 +103,19 @@ class Game
 			entities << Entity.new({ :x => map['stairs']['x'], :y => map['stairs']['y'], :character => ">", :color => Color.new(255, 255, 255) })			
 		end
 		
+		if !map['npcs'].nil?
+			map['npcs'].each do |npc|
+				entities << Entity.new({ :x => npc['x'], :y => npc['y'], :character => '@',
+				:color => Color.new(npc['color']['r'], npc['color']['g'], npc['color']['b'])})
+			end
+		end
+		
 		player = Entity.new({
 			# For identification
 			:name => 'Player',
 			# Display properties
 			:x => map['startX'].to_i, :y => map['startY'].to_i, :character => "@", :color => Color.new(255, 192, 32)
-		})
+		})		
 		
 		entities << player
 		
