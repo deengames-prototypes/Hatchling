@@ -8,9 +8,7 @@ require 'json'
 
 class Game
 
-	def initialize
-		@display = nil
-	end
+	attr_reader :current_map
 
 	def start
 		begin
@@ -30,8 +28,8 @@ class Game
 			@component_definitions = game_data['components']
 			
 			# Load the starting map.
-			start_map = JSON.parse(File.read("data/maps/#{game_data['starting_map']}"))
-			@entities = create_entities_for(start_map)			
+			@current_map = JSON.parse(File.read("data/maps/#{game_data['starting_map']}"))
+			@entities = create_entities_for(@current_map)			
 			player = @entities.find { |e| e.has?(:name) && e.name == 'Player' }
 			
 			# Pass entities to our systems	
@@ -54,9 +52,9 @@ class Game
 			
 			# Start drawing the main map
 			@display.fill_screen('.', Color.new(128, 128, 128))			
-			if (!start_map['walls'].nil?) then				
+			if (!@current_map['walls'].nil?) then				
 				white = Color.new(255, 255, 255)
-				start_map['walls'].each do |w|
+				@current_map['walls'].each do |w|
 					@entities << Entity.new({ :x => w[0], :y => w[1], :character => "#", :color => white })
 				end
 			end

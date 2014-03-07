@@ -13,17 +13,30 @@ class InputSystem
 	
 	def get_and_process_input		
 		input = Keys.read_character
-		
+		target = { x: @player.x, y: @player.y }
 		if (input == 'up') then
-			@player.y -= 1
+			target.y -= 1
 		elsif (input == 'down') then
-			@player.y += 1
+			target.y += 1
 		elsif (input == 'left') then
-			@player.x -= 1
+			target.x -= 1
 		elsif (input == 'right')
-			@player.x += 1
+			target.x += 1
+		end
+		
+		if is_movable?(target.x, target.y)
+			@player.x = target.x
+			@player.y = target.y
 		end
 		
 		return input
+	end
+	
+	def is_movable?(x, y)
+		map = Game.current_map
+		player = @player
+		
+		#if (x < 0 || x >= map.width 
+		return true
 	end
 end
