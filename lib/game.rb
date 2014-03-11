@@ -100,7 +100,7 @@ class Game
 		end
 		
 		if !map.stairs.nil? then
-			entities << Entity.new({ :x => map.stairs['x'], :y => map.stairs['y'], :character => ">", :color => Color.new(255, 255, 255) })			
+			entities << Entity.new({ :solid => false, :x => map.stairs['x'], :y => map.stairs['y'], :character => ">", :color => Color.new(255, 255, 255) })			
 		end
 		
 		if !map.npcs.nil?

@@ -43,7 +43,7 @@ class InputSystem
 		return false if (x < 0 || x >= map.width || y < 0 || y >= map.height)
 				
 		@entities.each do |e|
-			return false if x == e.x && y == e.y
+			return false if x == e.x && y == e.y && (!e.has?(:solid) || e.solid == true)
 		end		
 		
 		return true

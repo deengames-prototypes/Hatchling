@@ -25,7 +25,7 @@ class Entity < OpenStruct
 		if self.has?(name)
 			return @properties[name]
 		else
-			raise "There's no #{name} property defined on #{self.name.nil? ? self : self.name}"
+			raise "There's no #{name} property defined on #{self} (#{self.name})"
 		end
 	end
 end
