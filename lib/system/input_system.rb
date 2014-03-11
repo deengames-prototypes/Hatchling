@@ -1,4 +1,5 @@
 require 'ostruct'
+require_relative '../utils/logger'
 
 class InputSystem	
 
@@ -14,7 +15,7 @@ class InputSystem
 		Keys.read_character
 	end
 	
-	def get_and_process_input		
+	def get_and_process_input			
 		input = Keys.read_character
 		target = OpenStruct.new({ x: @player.x, y: @player.y })
 		if (input == 'up') then
@@ -27,25 +28,25 @@ class InputSystem
 			target.x += 1
 		end
 		
-		if is_movable?(target.x, target.y)
+		e = entity_at(target.x, target.y)
+		
+		if e.nil? || (e.has?(:solid) && e.solid == false)
 			@player.x = target.x
-			@player.y = target.y
+			@player.y = target.y			
 		end
 		
-		return input
+		if (!e.nil?)			
+			e.process_input(input)
+		end
+		
+		return input		
 	end
 	
-	def is_movable?(x, y)
-		map = Game.instance.current_map
-		player = @player
-		
-		return false if map['perimeter'] == true && (x == 0 || x == map['width'] - 1 || y == 0 || y == map['height'] - 1)
-		return false if (x < 0 || x >= map['width'] || y < 0 || y >= map['height'])
-				
+	def entity_at(x, y)		
 		@entities.each do |e|
-			return false if x == e.x && y == e.y && (!e.has?(:solid) || e.solid == true)
+			return e if x == e.x && y == e.y && e != @player
 		end		
 		
-		return true
+		return nil
 	end
 end

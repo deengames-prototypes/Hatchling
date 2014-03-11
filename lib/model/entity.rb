@@ -20,12 +20,12 @@ class Entity < OpenStruct
 			@properties[key] = hash[key]			
 		end
 	end
-	
-	def method_missing(name, *args)
-		if self.has?(name)
-			return @properties[name]
-		else
-			raise "There's no #{name} property defined on #{self} (#{self.name})"
-		end
+
+	def process_input(input)		
+		@properties.each do |key, value|						
+			if value.class.name == 'InputComponent'				
+				value.process_input(input)
+			end
+		end		
 	end
 end

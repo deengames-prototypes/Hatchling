@@ -5,19 +5,12 @@ require_relative 'io/audio_manager'
 require_relative 'io/keys'
 require_relative 'utils/color'
 require_relative 'model/entity'
+require_relative 'component/input_component'
 require 'json'
 
 class Game
 
 	attr_reader :current_map
-	
-	def self.instance
-		return @@instance
-	end
-
-	def initialize
-		@@instance = self
-	end
 
 	def start
 		begin
@@ -100,7 +93,10 @@ class Game
 		end
 		
 		if !map['stairs'].nil? then
-			entities << Entity.new({ :solid => false, :x => map['stairs']['x'], :y => map['stairs']['y'], :character => ">", :color => Color.new(255, 255, 255) })			
+			entities << Entity.new({
+				:solid => false, :x => map['stairs']['x'], :y => map['stairs']['y'], :character => ">", :color => Color.new(255, 255, 255),
+				:input => InputComponent.new(Proc.new { |input| raise "##{input}!" if input == '>' })
+			})			
 		end
 		
 		if !map['npcs'].nil?
