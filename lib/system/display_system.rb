@@ -1,8 +1,8 @@
 require_relative '../io/display'
 
 class DisplaySystem	
-
-	def initialize(entities)
+	
+	def init(entities)
 		@old_positions = []
 		@entities = entities
 		@display = Display.new

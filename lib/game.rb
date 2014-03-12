@@ -6,12 +6,18 @@ require_relative 'io/keys'
 require_relative 'utils/color'
 require_relative 'model/entity'
 require_relative 'component/input_component'
+require_relative 'model/dungeon'
 require 'json'
 
 class Game
 
 	attr_reader :current_map
-
+	
+	def initialize
+		@display = DisplaySystem.new
+		@input = InputSystem.new
+	end
+	
 	def start
 		begin
 			### Make sure all requires are called before this or the executable will crash			
@@ -30,13 +36,10 @@ class Game
 			@component_definitions = game_data.components
 			
 			# Load the starting map.
-			@current_map = JSON.parse(File.read("data/maps/#{game_data.starting_map}"))
-			@entities = create_entities_for(@current_map)			
-			player = @entities.find { |e| e.has?(:name) && e.name == 'Player' }
-			
-			# Pass entities to our systems	
-			@display = DisplaySystem.new(@entities) # replace map with entities
-			@input = InputSystem.new(@entities, player)
+			@current_map = OpenStruct.new(JSON.parse(File.read("data/maps/#{game_data.starting_map}")))
+			@current_map.floor = 0
+			change_map(@current_map)
+			@display.clear # change_map draws dots, but we can't init the display any later
 			
 			audio = AudioManager.new() # Convert to audio System; pass entities
 			
@@ -72,8 +75,8 @@ class Game
 		entities = []
 		grey = Color.new(192, 192, 192)
 		
-		if map['perimeter'] == true
-			(0 .. map['width']).each do |x|
+		if map.respond_to?('perimeter') && map.perimeter == true
+			(0 .. map.width).each do |x|
 				# NOT classes. Wall is a bunch of components and data.
 				# Components = DisplayComponent(x, y, char, color)
 				# That's all data. There's no code here. Yet.
@@ -83,32 +86,32 @@ class Game
 				# TODO: we have some common entities (eg. walls) and components (eg. display), irrespective of game content
 				# TODO: move this into a standard place for construction
 				entities << Entity.new({ :x => x, :y => 0, :character => '#', :color => grey })
-				entities << Entity.new({ :x => x, :y => map['height'] - 1, :character => '#', :color => grey })
+				entities << Entity.new({ :x => x, :y => map.height - 1, :character => '#', :color => grey })
 			end
 						
-			(0 .. map['height']).each do |y|
+			(0 .. map.height).each do |y|
 				entities << Entity.new({ :x => 0, :y => y, :character => '#', :color => grey })
-				entities << Entity.new({ :x => map['width'] - 1, :y => y, :character => '#', :color => grey })
+				entities << Entity.new({ :x => map.width - 1, :y => y, :character => '#', :color => grey })
 			end
 		end
 		
-		if !map['stairs'].nil? then
+		if map.respond_to?('stairs') && !map.stairs.nil? then
 			entities << Entity.new({
-				:solid => false, :x => map['stairs']['x'], :y => map['stairs']['y'], :character => ">", :color => Color.new(255, 255, 255),
-				:input => InputComponent.new(Proc.new { |input| raise "##{input}!" if input == '>' })
+				:solid => false, :x => map.stairs['x'], :y => map.stairs['y'], :character => ">", :color => Color.new(255, 255, 255),
+				:input => InputComponent.new(Proc.new { |input| change_map(Dungeon.new(@current_map.floor + 1)) if input == '>' })
 			})			
 		end
 		
-		if !map['npcs'].nil?
-			(map['npcs']).each do |npc|				
+		if map.respond_to?('npcs') && !map.npcs.nil?
+			(map.npcs).each do |npc|				
 				entities << Entity.new({ :x => npc['x'], :y => npc['y'], :character => '@',
 				:color => Color.new(npc['color']['r'], npc['color']['g'], npc['color']['b'])})
 			end
 		end
 		
-		if (!map['walls'].nil?) then				
+		if map.respond_to?('walls') && !map.walls.nil? then				
 			white = Color.new(255, 255, 255)
-			map['walls'].each do |w|
+			map.walls.each do |w|
 				entities << Entity.new({ :x => w[0], :y => w[1], :character => "#", :color => white })
 			end
 		end
@@ -117,11 +120,24 @@ class Game
 			# For identification
 			:name => 'Player',
 			# Display properties
-			:x => map['startX'].to_i, :y => map['startY'].to_i, :character => "@", :color => Color.new(255, 192, 32)
+			:x => map.start_x.to_i, :y => map.start_y.to_i, :character => "@", :color => Color.new(255, 192, 32)
 		})		
 		
 		entities << player
 		
 		return entities
+	end
+	
+	def change_map(new_map)
+		@current_map = new_map
+		
+		@entities = create_entities_for(@current_map)			
+		player = @entities.find { |e| e.has?(:name) && e.name == 'Player' }
+		
+		# Pass entities to our systems	
+		@display.init(@entities) # replace map with entities
+		@input.init(@entities, player)
+		
+		@display.fill_screen('.', Color.new(128, 128, 128))
 	end
 end

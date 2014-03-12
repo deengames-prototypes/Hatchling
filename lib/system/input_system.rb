@@ -1,9 +1,9 @@
 require 'ostruct'
 require_relative '../utils/logger'
 
-class InputSystem	
+class InputSystem
 
-	def initialize(entities, player)
+	def init(entities, player)
 		@player = player
 		@entities = entities
 	end	
