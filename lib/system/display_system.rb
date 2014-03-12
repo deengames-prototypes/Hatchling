@@ -9,7 +9,7 @@ class DisplaySystem
 	end	
 	
 	def destroy
-		@display.destroy
+		@display.destroy unless @display.nil?
 	end
 
 	def draw
@@ -22,12 +22,12 @@ class DisplaySystem
 		@old_positions = []
 		
 		@entities.each do |e|			
-			if e.has?(:character) && e.has?(:color)
+			if e.has?(:character) && e.has?(:color) && is_on_screen?(e.x, e.y)
 				@display.draw(e.x, e.y, e.character, e.color)
 				@old_positions << { :x => e.x, :y => e.y }
 			end
 		end		
-	end
+	end	
 	
 	def draw_text(x, y, text, color)
 		@display.draw(x, y, text, color)
@@ -43,5 +43,11 @@ class DisplaySystem
 				@display.draw(x, y, character, color)
 			end
 		end
+	end
+	
+	private
+	
+	def is_on_screen?(x, y)
+		return x >= 0 && x < @display.width && y >= 0 && y < @display.height			
 	end
 end
