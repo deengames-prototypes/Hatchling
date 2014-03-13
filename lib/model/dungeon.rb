@@ -47,11 +47,11 @@ class Dungeon
 				(@perimeter == true && (x == 0 || y == 0 || x == @width - 1 || y == @height - 1)) ||
 				# Filled in here
 				new_walls[x][y] == true
-			made << {:x => x, :y => y, :radius => radius}
-			Logger.info("Made a circle: #{x}, #{y}, r=#{radius}")
+			made << {:x => x, :y => y, :radius => radius}			
 		end		
 		
-		connect_unconnected_rooms(made, new_walls, last_seen)
+		g = GraphOperator.new(@width, @height, made, new_walls, last_seen)
+		g.connect_unconnected_rooms!()
 
 		# Convert to map data		
 		new_walls.each do |x, map|
@@ -62,67 +62,6 @@ class Dungeon
 		
 		@start_x = last_seen[:x]
 		@start_y = last_seen[:y]
-	end
-	
-	def connect_unconnected_rooms(circles, new_walls, player_start)
-		# This is a complex operation to ensure all our rooms are connected.
-		# Algorithm:
-		# 1) Find the room which the player inhabits (guaranteed to be the center of one circle)
-		# 2) Flood fill and store explored spaces.
-		# 3) Note the perimeter tiles of every room.
-		# 4) Break these into two groups: those connected (to the player point) and those unconnected
-		# 5) For every unconnected room:
-		# 		Calculate the distance of every perimeter tile to every connected room's perimeter tiles. Store the path.
-		#		Find the minimal path.
-		#		Make the path (walkable tiles)
-		# 6) Done!
-		
-		# Find the player's room
-		start_room = nil
-		circles.each do |c|
-			if player_start[:x] == c[:x] && player_start[:y] == c[:y]
-				start_room = c
-			end
-		end		
-		raise 'Can\'t find the player\'s starting room' if start_room.nil?
-		
-		# Flood-fill the map
-		visited_tiles = {}
-		empty_tiles = []
-		queue = [{:x => start_room[:x], :y => start_room[:y]}]
-				
-		(0 .. @width).each do |x|
-			visited_tiles[x] = {}
-			(0 .. @height).each do |y|
-				visited_tiles[x][y] = nil
-			end
-		end		
-		
-		processed = 0
-		while (queue.length > 0) do
-			current = queue.pop			
-			x = current[:x]
-			y = current[:y]
-			visited_tiles[x][y] = true
-			Logger.debug("Visited #{x}, #{y}")
-			empty_tiles << current if new_walls[x][y] == false
-			
-			# Queue conditions:
-			# 1) Position is on the map
-			# 2) Space is unoccupied
-			# 3) Space was never visited
-			# 4) Space is not in queue
-			spot = {:x => x - 1, :y => y}
-			queue << spot if x - 1 > 0 && new_walls[x - 1][y] == false && visited_tiles[x-1][y].nil? && !queue.include?(spot)
-			spot = {:x => x, :y => y - 1}
-			queue << spot if y - 1 > 0 && new_walls[x][y - 1] == false && visited_tiles[x][y-1].nil? && !queue.include?(spot)
-			spot = {:x => x + 1, :y => y}
-			queue << spot if x + 1 < @width && new_walls[x + 1][y] == false && visited_tiles[x+1][y].nil? && !queue.include?(spot)
-			spot = {:x => x, :y => y + 1}
-			queue << spot if y + 1 < @height && new_walls[x][y + 1] == false && visited_tiles[x][y+1].nil? && !queue.include?(spot)
-			processed += 1
-		end
-		Logger.debug "done: found #{empty_tiles.length} tiles, processed #{processed}"
 	end
 	
 	def distance(a, b)
@@ -149,5 +88,80 @@ class Dungeon
 		if !random_point.nil?
 			make_circle(random_point[:x], random_point[:y], radius / 2, walls, true)
 		end
+	end
+end
+
+class GraphOperator	
+	def initialize(width, height, rooms, new_walls, player_start)
+		@width = width
+		@height = height
+		@rooms = rooms
+		@new_walls = new_walls
+		@player_start = player_start
+	end
+	
+	def connect_unconnected_rooms!()
+		# This is a complex operation to ensure all our rooms are connected.
+		# Algorithm:
+		# 1) Find the room which the player inhabits (guaranteed to be the center of one circle)
+		# 2) Flood fill and store explored spaces.
+		# 3) Note the perimeter tiles of every room.
+		# 4) Break these into two groups: those connected (to the player point) and those unconnected
+		# 5) For every unconnected room:
+		# 		Calculate the distance of every perimeter tile to every connected room's perimeter tiles. Store the path.
+		#		Find the minimal path.
+		#		Make the path (walkable tiles)
+		# 6) Done!
+		
+		# Find the player's room
+		start_room = find_start_room()
+		
+		# Flood-fill the map
+		empty_tiles = find_empty_tiles()
+	end
+	
+	def find_start_room()	
+		@rooms.each do |c|
+			if @player_start[:x] == c[:x] && @player_start[:y] == c[:y]
+				return c
+			end
+		end		
+		raise 'Can\'t find start room for player'
+	end
+	
+	def find_empty_tiles()
+		empty_tiles = []
+		visited_tiles = {}				
+		queue = [{:x => @player_start[:x], :y => @player_start[:y]}]
+				
+		(0 .. @width).each do |x|
+			visited_tiles[x] = {}
+			(0 .. @height).each do |y|
+				visited_tiles[x][y] = nil
+			end
+		end		
+		
+		processed = 0
+		while (queue.length > 0) do
+			current = queue.pop			
+			x = current[:x]
+			y = current[:y]
+			visited_tiles[x][y] = true			
+			empty_tiles << current if @new_walls[x][y] == false
+			
+			# Queue conditions:
+			# 1) Position is on the map
+			# 2) Space is unoccupied
+			# 3) Space was never visited
+			# 4) Space is not in queue
+			spot = {:x => x - 1, :y => y}
+			queue << spot if x - 1 > 0 && @new_walls[x - 1][y] == false && visited_tiles[x-1][y].nil? && !queue.include?(spot)
+			spot = {:x => x, :y => y - 1}
+			queue << spot if y - 1 > 0 && @new_walls[x][y - 1] == false && visited_tiles[x][y-1].nil? && !queue.include?(spot)
+			spot = {:x => x + 1, :y => y}
+			queue << spot if x + 1 < @width && @new_walls[x + 1][y] == false && visited_tiles[x+1][y].nil? && !queue.include?(spot)
+			spot = {:x => x, :y => y + 1}
+			queue << spot if y + 1 < @height && @new_walls[x][y + 1] == false && visited_tiles[x][y+1].nil? && !queue.include?(spot)			
+		end		
 	end
 end
