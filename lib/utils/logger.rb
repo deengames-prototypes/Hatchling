@@ -2,12 +2,13 @@ require 'logging'
 
 class Logger
 	def self.init(filename)
+		File.delete("#{filename}.log") if File.exists?("#{filename}.log")
 		@@logger = Logging.logger['main']
 		@@logger.add_appenders(
 			#Logging.appenders.stdout,
 			Logging.appenders.file("#{filename}.log")
 		)
-		@@logger.level = :info
+		@@logger.level = :debug
 	end
 	
 	def self.info(message)

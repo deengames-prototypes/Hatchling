@@ -7,7 +7,7 @@ require_relative('../linux/rgb_color_strategy')
 
 # Wrapper around the display API (currently Curses)
 class Display
-	def initialize		
+	def initialize
 		ENV['TERM'] = 'xterm-256color' # Helps Linux only
 		Curses.noecho # do not show typed keys
 		Curses.init_screen		
@@ -65,6 +65,7 @@ class Display
 	end
 	
 	def destroy
+		Logger.info('Terminating display.')
 		Curses.close_screen
 	end
 end

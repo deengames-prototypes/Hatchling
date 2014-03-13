@@ -6,6 +6,9 @@ class Dungeon
 	
 	
 	def initialize(floor_num)
+		seed = 1024768
+		Random.srand(seed)
+		
 		@floor_num = floor_num		
 		@width = 80
 		@height = 25
@@ -29,20 +32,48 @@ class Dungeon
 				new_walls[x][y] = true
 			end
 		end
-		
-		# Create 5-10 circular rooms
-		made = 0
+				
+		made = []
+		# number of rooms to make
 		target = rand(10) + 30
 		
-		while (made < target)
+		while (made.length < target)
 			radius = rand(2) + 3
 			x = rand(@width)
-			y = rand(@height)
-			made += 1
+			y = rand(@height)			
 			make_circle(x, y, radius, new_walls, false)
-			last_seen = {:x => x, :y => y} unless @perimeter == true && (x == 0 || y == 0 || x == @width - 1 || y == @height - 1)
+			last_seen = {:x => x, :y => y} unless 
+				# Perimeter wall
+				(@perimeter == true && (x == 0 || y == 0 || x == @width - 1 || y == @height - 1)) ||
+				# Filled in here
+				new_walls[x][y] == true
+			made << {:x => x, :y => y, :radius => radius}
+			Logger.info("Made a circle: #{x}, #{y}, r=#{radius}")
 		end
 		
+		# Tunnel from circle to circle
+=begin
+		made.each do |circle|
+			current = circle
+			closest = find_closest_circle(current, made)
+			
+			# Tunnel. X first, then y
+			start = [current[:x], closest[:x]].min
+			stop =  [current[:x], closest[:x]].max
+			
+			(start .. stop).each do |x|			
+				new_walls[x][current[:y]] = false;
+			end
+			
+			start = [current[:y], closest[:y]].min
+			stop =  [current[:y], closest[:y]].max
+			(start .. stop).each do |y|
+				new_walls[closest[:x]][y] = false;
+			end			
+		end
+=end		
+
+		# Convert to map data		
 		new_walls.each do |x, map|
 			map.each do |y, is_wall| 
 				@walls << [x, y] if is_wall == true
@@ -51,6 +82,25 @@ class Dungeon
 		
 		@start_x = last_seen[:x]
 		@start_y = last_seen[:y]
+	end
+	
+	def find_closest_circle(current, all)
+		closest = all[-1]
+		d = distance(current, closest)
+		
+		all.each do |c|
+			n = distance(closest, c)
+			if (n < d && (current[:x] != closest[:x] || current[:y] != closest[:y])) then
+				d = n
+				closest = c
+			end
+		end
+		
+		closest
+	end
+	
+	def distance(a, b)
+		return ((a[:x] - b[:x])**2 + (a[:y] - b[:y])**2)
 	end
 	
 	def make_circle(x, y, radius, walls, filled)
@@ -65,7 +115,7 @@ class Dungeon
 					# The source of the magic number 30: If the radius is 3, there
 					# are roughly 12 perimeter points; if we want this to happen once
 					# every three circles, that's 1/36. 1/30 looks good.
-					random_point = {:x => i, :y => j} if rand(30) == 0 && !filled
+					#random_point = {:x => i, :y => j} if rand(30) == 0 && !filled
 				end
 			end
 		end

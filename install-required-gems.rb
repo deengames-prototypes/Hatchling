@@ -1,6 +1,7 @@
 # This installs all gems required to run the game.
 # Currently, there are none :)
 required = ['json', 'logging']
+required << 'win32-sound' if !RUBY_PLATFORM.include?('linux')
 
 required.each do |gem|
 	puts "Installing #{gem} ..."

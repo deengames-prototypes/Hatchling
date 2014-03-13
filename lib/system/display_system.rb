@@ -5,7 +5,7 @@ class DisplaySystem
 	def init(entities)
 		@old_positions = []
 		@entities = entities
-		@display = Display.new
+		@display = Display.new if @display.nil?
 	end	
 	
 	def destroy

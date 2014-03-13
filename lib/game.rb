@@ -65,7 +65,9 @@ class Game
 				input = @input.get_and_process_input
 				quit = (input == 'q' || input == 'escape')				
 			end
-		rescue
+			Logger.info('Normal termination')
+		rescue StandardError => e
+			Logger.info("Termination by error: #{e}")
 			@display.destroy unless @display.nil?
 			raise # Re-raise after cleaning up
 		end

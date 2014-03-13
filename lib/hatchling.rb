@@ -13,4 +13,4 @@ require_relative 'game'
 Logger.init(game_name)
 Logger.info('Starting game ...')
 Game.new.start
-Logger.info('Normal termination. Goodbye!');
+Logger.info('Goodbye!');
