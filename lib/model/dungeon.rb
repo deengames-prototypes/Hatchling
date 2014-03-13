@@ -49,29 +49,9 @@ class Dungeon
 				new_walls[x][y] == true
 			made << {:x => x, :y => y, :radius => radius}
 			Logger.info("Made a circle: #{x}, #{y}, r=#{radius}")
-		end
+		end		
 		
-		# Tunnel from circle to circle
-=begin
-		made.each do |circle|
-			current = circle
-			closest = find_closest_circle(current, made)
-			
-			# Tunnel. X first, then y
-			start = [current[:x], closest[:x]].min
-			stop =  [current[:x], closest[:x]].max
-			
-			(start .. stop).each do |x|			
-				new_walls[x][current[:y]] = false;
-			end
-			
-			start = [current[:y], closest[:y]].min
-			stop =  [current[:y], closest[:y]].max
-			(start .. stop).each do |y|
-				new_walls[closest[:x]][y] = false;
-			end			
-		end
-=end		
+		connect_unconnected_rooms(made, new_walls, last_seen)
 
 		# Convert to map data		
 		new_walls.each do |x, map|
@@ -84,19 +64,65 @@ class Dungeon
 		@start_y = last_seen[:y]
 	end
 	
-	def find_closest_circle(current, all)
-		closest = all[-1]
-		d = distance(current, closest)
+	def connect_unconnected_rooms(circles, new_walls, player_start)
+		# This is a complex operation to ensure all our rooms are connected.
+		# Algorithm:
+		# 1) Find the room which the player inhabits (guaranteed to be the center of one circle)
+		# 2) Flood fill and store explored spaces.
+		# 3) Note the perimeter tiles of every room.
+		# 4) Break these into two groups: those connected (to the player point) and those unconnected
+		# 5) For every unconnected room:
+		# 		Calculate the distance of every perimeter tile to every connected room's perimeter tiles. Store the path.
+		#		Find the minimal path.
+		#		Make the path (walkable tiles)
+		# 6) Done!
 		
-		all.each do |c|
-			n = distance(closest, c)
-			if (n < d && (current[:x] != closest[:x] || current[:y] != closest[:y])) then
-				d = n
-				closest = c
+		# Find the player's room
+		start_room = nil
+		circles.each do |c|
+			if player_start[:x] == c[:x] && player_start[:y] == c[:y]
+				start_room = c
 			end
-		end
+		end		
+		raise 'Can\'t find the player\'s starting room' if start_room.nil?
 		
-		closest
+		# Flood-fill the map
+		visited_tiles = {}
+		empty_tiles = []
+		queue = [{:x => start_room[:x], :y => start_room[:y]}]
+				
+		(0 .. @width).each do |x|
+			visited_tiles[x] = {}
+			(0 .. @height).each do |y|
+				visited_tiles[x][y] = nil
+			end
+		end		
+		
+		processed = 0
+		while (queue.length > 0) do
+			current = queue.pop			
+			x = current[:x]
+			y = current[:y]
+			visited_tiles[x][y] = true
+			Logger.debug("Visited #{x}, #{y}")
+			empty_tiles << current if new_walls[x][y] == false
+			
+			# Queue conditions:
+			# 1) Position is on the map
+			# 2) Space is unoccupied
+			# 3) Space was never visited
+			# 4) Space is not in queue
+			spot = {:x => x - 1, :y => y}
+			queue << spot if x - 1 > 0 && new_walls[x - 1][y] == false && visited_tiles[x-1][y].nil? && !queue.include?(spot)
+			spot = {:x => x, :y => y - 1}
+			queue << spot if y - 1 > 0 && new_walls[x][y - 1] == false && visited_tiles[x][y-1].nil? && !queue.include?(spot)
+			spot = {:x => x + 1, :y => y}
+			queue << spot if x + 1 < @width && new_walls[x + 1][y] == false && visited_tiles[x+1][y].nil? && !queue.include?(spot)
+			spot = {:x => x, :y => y + 1}
+			queue << spot if y + 1 < @height && new_walls[x][y + 1] == false && visited_tiles[x][y+1].nil? && !queue.include?(spot)
+			processed += 1
+		end
+		Logger.debug "done: found #{empty_tiles.length} tiles, processed #{processed}"
 	end
 	
 	def distance(a, b)
@@ -115,7 +141,7 @@ class Dungeon
 					# The source of the magic number 30: If the radius is 3, there
 					# are roughly 12 perimeter points; if we want this to happen once
 					# every three circles, that's 1/36. 1/30 looks good.
-					#random_point = {:x => i, :y => j} if rand(30) == 0 && !filled
+					# random_point = {:x => i, :y => j} if rand(30) == 0 && !filled
 				end
 			end
 		end
