@@ -35,7 +35,7 @@ class Dungeon
 				
 		made = []
 		# number of rooms to make
-		target = rand(10) + 30
+		target = rand(10) + 30		
 		
 		while (made.length < target)
 			radius = rand(2) + 3
@@ -118,8 +118,22 @@ class GraphOperator
 		
 		# Flood-fill the map
 		empty_tiles = find_empty_tiles()
+		
+		# Find perimeters by room
+		perimeters = find_perimeters
+		
+		# Assign: connected or not?		
+		perimeters.each do |p|
+			room = p[:room]
+			if empty_tiles.include?({:x => room[:x], :y => room[:y]}) then
+				room[:connected] = true				
+			else
+				room[:connected] = false				
+			end
+		end
 	end
 	
+	# Returns a room object (:x, :y, :radius)
 	def find_start_room()	
 		@rooms.each do |c|
 			if @player_start[:x] == c[:x] && @player_start[:y] == c[:y]
@@ -129,6 +143,7 @@ class GraphOperator
 		raise 'Can\'t find start room for player'
 	end
 	
+	# Returns a bunch of elements like {:x => i, :y => j}
 	def find_empty_tiles()
 		empty_tiles = []
 		visited_tiles = {}				
@@ -162,6 +177,38 @@ class GraphOperator
 			queue << spot if x + 1 < @width && @new_walls[x + 1][y] == false && visited_tiles[x+1][y].nil? && !queue.include?(spot)
 			spot = {:x => x, :y => y + 1}
 			queue << spot if y + 1 < @height && @new_walls[x][y + 1] == false && visited_tiles[x][y+1].nil? && !queue.include?(spot)			
-		end		
+		end
+
+		return empty_tiles		
+	end
+	
+	# Returns an array, where each element is {room => r, points => [ ... ]}
+	# NOTE: doesn't return exactly the outside wall of each perimeter tile. More
+	# like, returns a bunch of points along the perimeter. 
+	# But, ya know, it's good enough for what I want.
+	def find_perimeters
+		to_return = [] # same order as @rooms
+		@rooms.each do |r|
+			x = r[:x]
+			y = r[:y]
+			radius = r[:radius]
+			this_circle = []
+			(x - radius .. x + radius).each do |i|			
+				# +y and -y
+				# x^2 - y^2 = r^2 => y = sqrt(r^2 - x^2)
+				j = Math.sqrt(radius**2 - (i-x)**2).round
+				
+				point = {:x => i, :y => y + j}
+				this_circle << point unless this_circle.include?(point)
+				point = {:x => i, :y => y - j}
+				this_circle << point unless this_circle.include?(point)
+			end
+			
+			obj = {:room => r, :tiles => this_circle}
+			to_return << obj
+			Logger.debug("Added #{obj}")
+		end
+		
+		return to_return
 	end
 end
