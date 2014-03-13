@@ -39,8 +39,8 @@ class Dungeon
 			x = rand(@width)
 			y = rand(@height)
 			made += 1
-			carve_out_circle(x, y, radius, new_walls)
-			last_seen = {:x => x, :y => y}
+			make_circle(x, y, radius, new_walls, false)
+			last_seen = {:x => x, :y => y} unless @perimeter == true && (x == 0 || y == 0 || x == @width - 1 || y == @height - 1)
 		end
 		
 		new_walls.each do |x, map|
@@ -53,16 +53,25 @@ class Dungeon
 		@start_y = last_seen[:y]
 	end
 	
-	def carve_out_circle(x, y, radius, walls)
-		walls[x][y] = false		
-		half_radius = (radius).ceil
-		Logger.info("#{x - half_radius}, #{y - half_radius} to #{x + half_radius}, #{y + half_radius}")
-		(x - half_radius .. x + half_radius).each do |i|
-			(y - half_radius .. y + half_radius).each do |j|
+	def make_circle(x, y, radius, walls, filled)
+		random_point = nil
+		
+		walls[x][y] = false						
+		(x - radius .. x + radius).each do |i|
+			(y - radius .. y + radius).each do |j|
 				if (i - x)**2 + (j - y)**2 <= radius**2 && i >= 0 && j >= 0 && i < @width && j < @height then					
-					walls[i][j] = false
+					walls[i][j] = filled
+					# Randomly pick a perimeter point and generate a filled circle
+					# The source of the magic number 30: If the radius is 3, there
+					# are roughly 12 perimeter points; if we want this to happen once
+					# every three circles, that's 1/36. 1/30 looks good.
+					random_point = {:x => i, :y => j} if rand(30) == 0 && !filled
 				end
 			end
+		end
+		
+		if !random_point.nil?
+			make_circle(random_point[:x], random_point[:y], radius / 2, walls, true)
 		end
 	end
 end
