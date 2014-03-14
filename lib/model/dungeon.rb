@@ -185,32 +185,26 @@ class GraphOperator
 		last_spot = nil
 		
 		if m.abs < 1
-			# Tunnel horizontally
-			Logger.debug("HOrizontal")
+			# Tunnel horizontally			
 			if stop_x < start_x						
 				start_x, stop_x = stop_x, start_x
-				start_y, stop_y = stop_y, start_y
-				Logger.debug("\tReversing")
+				start_y, stop_y = stop_y, start_y				
 			end
 			
 			(start_x .. stop_x).each do |x|
 				# y - y1 = m(x - x1)
 				# y = m(x-x1) + y1
 				y = m * (x - start_x) + start_y
-				@new_walls[x][y.round] = false
-				Logger.debug("\tTunnel at #{x}, #{y.round}")
+				@new_walls[x][y.round] = false				
 				
 				if !last_spot.nil?
-					d = (x - last_spot[:x]).abs + (y.round - last_spot[:y]).abs
-					Logger.debug("\t\td=#{d}") unless d <= 1
+					d = (x - last_spot[:x]).abs + (y.round - last_spot[:y]).abs					
 					if d >= 1.5
 						min = [last_spot[:y], y.round].min
-						max = [last_spot[:y], y.round].max
-						Logger.debug("\t\tCorrecting: from #{min} to #{max}")
+						max = [last_spot[:y], y.round].max						
 						(min .. max).each do |j|
 							i = ((j - last_spot[:y]) / m) + x
 							@new_walls[i.round][j] = false
-							Logger.debug("\t\t\tCOrrection at #{i.round}, #{j}")							
 						end
 					end
 				end
@@ -218,13 +212,11 @@ class GraphOperator
 				
 				last_spot = {:x => x, :y => y.round}
 			end
-		elsif m > 1
-			Logger.debug("Vertical")
+		elsif m > 1			
 			# Tunnel vertically
 			if stop_y < start_y	
 				start_x, stop_x = stop_x, start_x
-				start_y, stop_y = stop_y, start_y
-				Logger.debug("Reversing")
+				start_y, stop_y = stop_y, start_y				
 			end
 			
 			(start_y .. stop_y).each do |y|
@@ -235,8 +227,7 @@ class GraphOperator
 				@new_walls[x.round][y] = false
 				
 				if !last_spot.nil?
-					d = (x - last_spot[:x]).abs + (y.round - last_spot[:y]).abs
-					Logger.debug("D=#{d}") unless d <= 1
+					d = (x - last_spot[:x]).abs + (y.round - last_spot[:y]).abs					
 					if d >= 1.5
 						min = [last_spot[:x], x.round].min
 						max = [last_spot[:x], x.round].max
@@ -246,16 +237,13 @@ class GraphOperator
 						end
 					end
 				end
-				
-				Logger.debug("Tunnelz at #{x.round}, #{y}")				
+								
 				last_spot = {:x => x.round, :y => y}
 			end
-		else # m == 1
-			Logger.debug("DIAGONALZ")
+		else # m == 1			
 			if stop_x < start_x						
 				start_x, stop_x = stop_x, start_x
 				start_y, stop_y = stop_y, start_y
-				Logger.debug("Reversing")
 			end
 
 			y_increment = (m > 0 ? 1 : -1)
@@ -264,13 +252,8 @@ class GraphOperator
 			(start_x .. stop_x).each do |x|				
 				# We're at x, y and want to get to x+1, y+1
 				# So delve out x+1, y too
-				#@new_walls[x][y - y_increment] = false
 				@new_walls[x][y] = false
 				@new_walls[x][y + y_increment] = false
-				Logger.debug("\tTunnel #{x},#{y}")
-				Logger.debug("\tTunnel #{x},#{y + y_increment}")
-				#@new_walls[x + 1][start_y] = false
-				#@new_walls[x][start_y + y_increment] = false
 				y += y_increment				
 			end
 		end
