@@ -35,7 +35,7 @@ class Dungeon
 				
 		made = []
 		# number of rooms to make
-		target = 3#rand(10) + 30		
+		target = 5#rand(10) + 30		
 		
 		while (made.length < target)
 			radius = rand(2) + 3
@@ -176,51 +176,101 @@ class GraphOperator
 		return empty_tiles		
 	end	
 		
+	# Tunnel along a line, filling in gaps as necessary
 	def tunnel(start_x, start_y, stop_x, stop_y)
 		Logger.debug("Tunnel from #{start_x}, #{start_y} to #{stop_x}, #{stop_y}")		
+		m = (0.0 + stop_y - start_y) / (stop_x - start_x)		
+		last_spot = nil
 		
-		if stop_x < start_x						
-			start_x, stop_x = stop_x, start_x
-			start_y, stop_y = stop_y, start_y
-			Logger.debug("Reversing")
-		end
-		
-		m = (0.0 + stop_y - start_y) / (stop_x - start_x)
-		y_increment = (1.0 * stop_y - start_y) / (stop_x - start_x)
-		Logger.debug("m=#{m}, i = #{y_increment}")		
-		
-		current_y = start_y
-		last_tunneled = nil
-		(start_x .. stop_x).each do |x|			
-			tile_y = current_y.round
-			@new_walls[x][tile_y] = false
-			Logger.debug("Punching a hole at #{x}, #{tile_y}")
+		if m.abs < 1
+			# Tunnel horizontally
+			Logger.debug("HOrizontal")
+			if stop_x < start_x						
+				start_x, stop_x = stop_x, start_x
+				start_y, stop_y = stop_y, start_y
+				Logger.debug("\tReversing")
+			end
 			
-			# Did we create a disjointed connection? Fix it.
-			if !last_tunneled.nil? && (x - last_tunneled[:x]).abs + (tile_y - last_tunneled[:y]).abs >= 2
-				# Horizontal tunnel
-				if m.abs <= 1
-					(last_tunneled[:x] .. x).each do |i|
-						# y - y1 = m(x - x1)
-						# y = m(x-x1) + y1
-						j = m * (i - last_tunneled[:x]) + last_tunneled[:y]
-						@new_walls[i][j.round] = false
-						Logger.debug("Adjustment at #{i}, #{j.round}")
-					end
-				else					
-					(last_tunneled[:y] .. tile_y).each do |j|
-						# y - y1 = m(x - x1)
-						# (y - y1)/m = x-x1
-						# (y-y1)/m  +x1 = x
-						i = ((j - last_tunneled[:y]) / (0.0 + m)) + last_tunneled[:x]						
-						@new_walls[i.round][j] = false
-						Logger.debug("Adjustment at #{i.round}, #{j}")
+			(start_x .. stop_x).each do |x|
+				# y - y1 = m(x - x1)
+				# y = m(x-x1) + y1
+				y = m * (x - start_x) + start_y
+				@new_walls[x][y.round] = false
+				Logger.debug("\tTunnel at #{x}, #{y.round}")
+				
+				if !last_spot.nil?
+					d = (x - last_spot[:x]).abs + (y.round - last_spot[:y]).abs
+					Logger.debug("\t\td=#{d}") unless d <= 1
+					if d >= 1.5
+						min = [last_spot[:y], y.round].min
+						max = [last_spot[:y], y.round].max
+						Logger.debug("\t\tCorrecting: from #{min} to #{max}")
+						(min .. max).each do |j|
+							i = ((j - last_spot[:y]) / m) + x
+							@new_walls[i.round][j] = false
+							Logger.debug("\t\t\tCOrrection at #{i.round}, #{j}")							
+						end
 					end
 				end
+				
+				
+				last_spot = {:x => x, :y => y.round}
 			end
-						
-			last_tunneled = {:x => x, :y => tile_y}
-			current_y += y_increment
+		elsif m > 1
+			Logger.debug("Vertical")
+			# Tunnel vertically
+			if stop_y < start_y	
+				start_x, stop_x = stop_x, start_x
+				start_y, stop_y = stop_y, start_y
+				Logger.debug("Reversing")
+			end
+			
+			(start_y .. stop_y).each do |y|
+				# y - y1 = m(x - x1)
+				# (y - y1)/m = x-x1
+				# (y-y1)/m  +x1 = x
+				x = ((y - start_y) / (0.0 + m)) + start_x
+				@new_walls[x.round][y] = false
+				
+				if !last_spot.nil?
+					d = (x - last_spot[:x]).abs + (y.round - last_spot[:y]).abs
+					Logger.debug("D=#{d}") unless d <= 1
+					if d >= 1.5
+						min = [last_spot[:x], x.round].min
+						max = [last_spot[:x], x.round].max
+						(min .. max).each do |i|
+							j = m * (i - last_spot[:x]) + y
+							@new_walls[i][j.round] = false
+						end
+					end
+				end
+				
+				Logger.debug("Tunnelz at #{x.round}, #{y}")				
+				last_spot = {:x => x.round, :y => y}
+			end
+		else # m == 1
+			Logger.debug("DIAGONALZ")
+			if stop_x < start_x						
+				start_x, stop_x = stop_x, start_x
+				start_y, stop_y = stop_y, start_y
+				Logger.debug("Reversing")
+			end
+
+			y_increment = (m > 0 ? 1 : -1)
+			y = start_y
+			
+			(start_x .. stop_x).each do |x|				
+				# We're at x, y and want to get to x+1, y+1
+				# So delve out x+1, y too
+				#@new_walls[x][y - y_increment] = false
+				@new_walls[x][y] = false
+				@new_walls[x][y + y_increment] = false
+				Logger.debug("\tTunnel #{x},#{y}")
+				Logger.debug("\tTunnel #{x},#{y + y_increment}")
+				#@new_walls[x + 1][start_y] = false
+				#@new_walls[x][start_y + y_increment] = false
+				y += y_increment				
+			end
 		end
 	end
 	
