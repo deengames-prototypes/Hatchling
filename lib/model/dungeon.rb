@@ -6,8 +6,9 @@ class Dungeon
 	
 	
 	def initialize(floor_num)
-		seed = 1024768
-		Random.srand(seed)
+		# Set the seed here for seeded games
+		# seed = 1024768
+		# Random.srand(seed)
 		
 		@floor_num = floor_num		
 		@width = 80
