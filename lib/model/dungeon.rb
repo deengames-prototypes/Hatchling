@@ -217,16 +217,13 @@ class GraphOperator
 					d = (x - last_spot[:x]).abs + (y.round - last_spot[:y]).abs
 					if d >= 1.5
 						min = [last_spot[:y], y.round].min
-						max = [last_spot[:y], y.round].max						
-						Logger.info("\tBug? y goes from min=#{min}, max=#{max}, d=#{d}")
-						(min .. max).each do |j|
-							Logger.info("\t\ti = ((#{j} - #{last_spot[:y]}) / #{m.round}) + #{x}")
+						max = [last_spot[:y], y.round].max												
+						(min .. max).each do |j|							
 							if (m.round != 0)
 								i = ((j - last_spot[:y]) / m.round) + x
 							else
 								i = x
-							end
-							Logger.info("\t\t\tBug? #{i.round}, #{j}")
+							end							
 							@new_walls[i.round][j] = false
 						end
 					end
