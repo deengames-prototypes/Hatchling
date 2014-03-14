@@ -67,7 +67,7 @@ class Game
 			end
 			Logger.info('Normal termination')
 		rescue StandardError => e
-			Logger.info("Termination by error: #{e}")
+			Logger.info("Termination by error: #{e}\n#{e.backtrace}")
 			@display.destroy unless @display.nil?
 			raise # Re-raise after cleaning up
 		end

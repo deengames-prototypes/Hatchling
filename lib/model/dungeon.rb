@@ -35,7 +35,7 @@ class Dungeon
 				
 		made = []
 		# number of rooms to make
-		target = rand(10) + 30		
+		target = 3#rand(10) + 30		
 		
 		while (made.length < target)
 			radius = rand(2) + 3
@@ -62,10 +62,6 @@ class Dungeon
 		
 		@start_x = last_seen[:x]
 		@start_y = last_seen[:y]
-	end
-	
-	def distance(a, b)
-		return ((a[:x] - b[:x])**2 + (a[:y] - b[:y])**2)
 	end
 	
 	def make_circle(x, y, radius, walls, filled)
@@ -101,17 +97,11 @@ class GraphOperator
 	end
 	
 	def connect_unconnected_rooms!()
-		# This is a complex operation to ensure all our rooms are connected.
-		# Algorithm:
-		# 1) Find the room which the player inhabits (guaranteed to be the center of one circle)
-		# 2) Flood fill and store explored spaces.
-		# 3) Note the perimeter tiles of every room.
-		# 4) Break these into two groups: those connected (to the player point) and those unconnected
-		# 5) For every unconnected room:
-		# 		Calculate the distance of every perimeter tile to every connected room's perimeter tiles. Store the path.
-		#		Find the minimal path.
-		#		Make the path (walkable tiles)
-		# 6) Done!
+		# What are we doing here?
+		# 1) Create a spanning tree of all rooms
+		# 		For each room, find the closest room
+		# 2) For each unconnected room, tunnel to the closest room
+		# NB: Start at the starting room (contains the player)
 		
 		# Find the player's room
 		start_room = find_start_room()
@@ -119,17 +109,21 @@ class GraphOperator
 		# Flood-fill the map
 		empty_tiles = find_empty_tiles()
 		
-		# Find perimeters by room
-		perimeters = find_perimeters
+		# Assign: connected or not?
+		connected_rooms = []
+		unconnected_rooms = []		
 		
-		# Assign: connected or not?		
-		perimeters.each do |p|
-			room = p[:room]
-			if empty_tiles.include?({:x => room[:x], :y => room[:y]}) then
-				room[:connected] = true				
+		@rooms.each do |r|
+			if empty_tiles.include?({:x => r[:x], :y => r[:y]}) then
+				connected_rooms << r
 			else
-				room[:connected] = false				
+				unconnected_rooms << r
 			end
+		end
+		
+		unconnected_rooms.each do |r|
+			closest = find_closest_room(r, @rooms)
+			tunnel(r[:x], r[:y], closest[:x], closest[:y])
 		end
 	end
 	
@@ -180,35 +174,73 @@ class GraphOperator
 		end
 
 		return empty_tiles		
-	end
-	
-	# Returns an array, where each element is {room => r, points => [ ... ]}
-	# NOTE: doesn't return exactly the outside wall of each perimeter tile. More
-	# like, returns a bunch of points along the perimeter. 
-	# But, ya know, it's good enough for what I want.
-	def find_perimeters
-		to_return = [] # same order as @rooms
-		@rooms.each do |r|
-			x = r[:x]
-			y = r[:y]
-			radius = r[:radius]
-			this_circle = []
-			(x - radius .. x + radius).each do |i|			
-				# +y and -y
-				# x^2 - y^2 = r^2 => y = sqrt(r^2 - x^2)
-				j = Math.sqrt(radius**2 - (i-x)**2).round
-				
-				point = {:x => i, :y => y + j}
-				this_circle << point unless this_circle.include?(point)
-				point = {:x => i, :y => y - j}
-				this_circle << point unless this_circle.include?(point)
-			end
-			
-			obj = {:room => r, :tiles => this_circle}
-			to_return << obj
-			Logger.debug("Added #{obj}")
+	end	
+		
+	def tunnel(start_x, start_y, stop_x, stop_y)
+		Logger.debug("Tunnel from #{start_x}, #{start_y} to #{stop_x}, #{stop_y}")		
+		
+		if stop_x < start_x						
+			start_x, stop_x = stop_x, start_x
+			start_y, stop_y = stop_y, start_y
+			Logger.debug("Reversing")
 		end
 		
-		return to_return
+		m = (0.0 + stop_y - start_y) / (stop_x - start_x)
+		y_increment = (1.0 * stop_y - start_y) / (stop_x - start_x)
+		Logger.debug("m=#{m}, i = #{y_increment}")		
+		
+		current_y = start_y
+		last_tunneled = nil
+		(start_x .. stop_x).each do |x|			
+			tile_y = current_y.round
+			@new_walls[x][tile_y] = false
+			Logger.debug("Punching a hole at #{x}, #{tile_y}")
+			
+			# Did we create a disjointed connection? Fix it.
+			if !last_tunneled.nil? && (x - last_tunneled[:x]).abs + (tile_y - last_tunneled[:y]).abs >= 2
+				# Horizontal tunnel
+				if m.abs <= 1
+					(last_tunneled[:x] .. x).each do |i|
+						# y - y1 = m(x - x1)
+						# y = m(x-x1) + y1
+						j = m * (i - last_tunneled[:x]) + last_tunneled[:y]
+						@new_walls[i][j.round] = false
+						Logger.debug("Adjustment at #{i}, #{j.round}")
+					end
+				else					
+					(last_tunneled[:y] .. tile_y).each do |j|
+						# y - y1 = m(x - x1)
+						# (y - y1)/m = x-x1
+						# (y-y1)/m  +x1 = x
+						i = ((j - last_tunneled[:y]) / (0.0 + m)) + last_tunneled[:x]						
+						@new_walls[i.round][j] = false
+						Logger.debug("Adjustment at #{i.round}, #{j}")
+					end
+				end
+			end
+						
+			last_tunneled = {:x => x, :y => tile_y}
+			current_y += y_increment
+		end
+	end
+	
+	def find_closest_room(room, rooms)
+		min_distance = 999999
+		min_room = nil
+		
+		rooms.each do |r|
+			next if r == room || (room[:x] == r[:x] && room[:y] == r[:y])
+			d = distance(r[:x], r[:y], room[:x], room[:y])
+			if d < min_distance
+				min_distance = d
+				min_room = r
+			end
+		end
+		
+		return min_room
+	end
+	
+	def distance(x1, y1, x2, y2)
+		return ((x2 - x1)**2 + (y2 - y1)**2)
 	end
 end
