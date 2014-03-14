@@ -10,6 +10,11 @@ class Dungeon
 		# seed = 1024768
 		# Random.srand(seed)
 		
+		#seed = srand()
+		#srand(seed)
+		#Logger.info("This is game ##{seed}")
+		srand(39993836868370202900798893951177452904)
+		
 		@floor_num = floor_num		
 		@width = 80
 		@height = 25
@@ -34,11 +39,11 @@ class Dungeon
 			end
 		end
 				
-		made = []
+		rooms = []
 		# number of rooms to make
 		target = rand(10) + 30		
 		
-		while (made.length < target)
+		while (rooms.length < target)
 			radius = rand(2) + 3
 			x = rand(@width)
 			y = rand(@height)			
@@ -48,10 +53,10 @@ class Dungeon
 				(@perimeter == true && (x == 0 || y == 0 || x == @width - 1 || y == @height - 1)) ||
 				# Filled in here
 				new_walls[x][y] == true
-			made << {:x => x, :y => y, :radius => radius}			
+			rooms << {:x => x, :y => y, :radius => radius}			
 		end		
 		
-		g = GraphOperator.new(@width, @height, made, new_walls, last_seen)
+		g = GraphOperator.new(@width, @height, rooms, new_walls, last_seen)
 		g.connect_unconnected_rooms!()
 
 		# Convert to map data		
@@ -63,6 +68,16 @@ class Dungeon
 		
 		@start_x = last_seen[:x]
 		@start_y = last_seen[:y]
+		
+		# Populate stairs
+		target = {:x => last_seen[:x], :y => last_seen[:y]}
+		while (target[:x] == @start_x && target[:y] == @start_y) do
+			room = rooms[rand(rooms.length)]
+			target[:x] = room[:x]
+			target[:y] = room[:y]
+		end
+		
+		Logger.debug("Stairs are at #{target}")
 	end
 	
 	def make_circle(x, y, radius, walls, filled)
@@ -196,14 +211,22 @@ class GraphOperator
 				# y = m(x-x1) + y1
 				y = m * (x - start_x) + start_y
 				@new_walls[x][y.round] = false				
+				Logger.info("\tTunelled at #{x}, #{y.round}")
 				
 				if !last_spot.nil?
-					d = (x - last_spot[:x]).abs + (y.round - last_spot[:y]).abs					
+					d = (x - last_spot[:x]).abs + (y.round - last_spot[:y]).abs
 					if d >= 1.5
 						min = [last_spot[:y], y.round].min
 						max = [last_spot[:y], y.round].max						
+						Logger.info("\tBug? y goes from min=#{min}, max=#{max}, d=#{d}")
 						(min .. max).each do |j|
-							i = ((j - last_spot[:y]) / m) + x
+							Logger.info("\t\ti = ((#{j} - #{last_spot[:y]}) / #{m.round}) + #{x}")
+							if (m.round != 0)
+								i = ((j - last_spot[:y]) / m.round) + x
+							else
+								i = x
+							end
+							Logger.info("\t\t\tBug? #{i.round}, #{j}")
 							@new_walls[i.round][j] = false
 						end
 					end
@@ -232,7 +255,7 @@ class GraphOperator
 						min = [last_spot[:x], x.round].min
 						max = [last_spot[:x], x.round].max
 						(min .. max).each do |i|
-							j = m * (i - last_spot[:x]) + y
+							j = m.round * (i - last_spot[:x]) + y
 							@new_walls[i][j.round] = false
 						end
 					end
