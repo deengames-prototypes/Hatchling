@@ -10,11 +10,10 @@ class Dungeon
 		# seed = 1024768
 		# Random.srand(seed)
 		
-		#seed = srand()
-		#srand(seed)
-		#Logger.info("This is game ##{seed}")
-		srand(39993836868370202900798893951177452904)
-		
+		seed = srand()
+		srand(seed)
+		Logger.info("This is game ##{seed}")
+				
 		@floor_num = floor_num		
 		@width = 80
 		@height = 25
@@ -40,7 +39,7 @@ class Dungeon
 		end
 				
 		rooms = []
-		# number of rooms to make
+		# number of rooms to make		
 		target = rand(10) + 30		
 		
 		while (rooms.length < target)
@@ -197,7 +196,7 @@ class GraphOperator
 	def tunnel(start_x, start_y, stop_x, stop_y)
 		Logger.debug("*Tunnel from #{start_x}, #{start_y} to #{stop_x}, #{stop_y}")		
 		m = (0.0 + stop_y - start_y) / (stop_x - start_x)		
-		last_spot = nil
+		last_spot = nil		
 		
 		if m.abs < 1
 			# Tunnel horizontally			
@@ -211,7 +210,6 @@ class GraphOperator
 				# y = m(x-x1) + y1
 				y = m * (x - start_x) + start_y
 				@new_walls[x][y.round] = false				
-				Logger.info("\tTunelled at #{x}, #{y.round}")
 				
 				if !last_spot.nil?
 					d = (x - last_spot[:x]).abs + (y.round - last_spot[:y]).abs
@@ -232,8 +230,8 @@ class GraphOperator
 				
 				last_spot = {:x => x, :y => y.round}
 			end
-		elsif m > 1			
-			# Tunnel vertically
+		elsif m.abs > 1
+			# Tunnel vertically			
 			if stop_y < start_y	
 				start_x, stop_x = stop_x, start_x
 				start_y, stop_y = stop_y, start_y				
