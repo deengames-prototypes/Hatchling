@@ -35,7 +35,7 @@ class Dungeon
 				
 		made = []
 		# number of rooms to make
-		target = 5#rand(10) + 30		
+		target = rand(10) + 30		
 		
 		while (made.length < target)
 			radius = rand(2) + 3
@@ -122,8 +122,9 @@ class GraphOperator
 		end
 		
 		unconnected_rooms.each do |r|
-			closest = find_closest_room(r, @rooms)
+			closest = find_closest_room(r, connected_rooms)
 			tunnel(r[:x], r[:y], closest[:x], closest[:y])
+			connected_rooms << r
 		end
 	end
 	
@@ -178,7 +179,7 @@ class GraphOperator
 		
 	# Tunnel along a line, filling in gaps as necessary
 	def tunnel(start_x, start_y, stop_x, stop_y)
-		Logger.debug("Tunnel from #{start_x}, #{start_y} to #{stop_x}, #{stop_y}")		
+		Logger.debug("*Tunnel from #{start_x}, #{start_y} to #{stop_x}, #{stop_y}")		
 		m = (0.0 + stop_y - start_y) / (stop_x - start_x)		
 		last_spot = nil
 		
