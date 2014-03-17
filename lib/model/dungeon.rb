@@ -1,20 +1,12 @@
 require_relative '../utils/logger'
 
 class Dungeon
-	attr_reader :stairs, :walls, :start_x, :start_y
-	attr_reader :perimeter, :width, :height
+	attr_reader :stairs, :walls, :floor # TODO: replace with generic list
+	attr_reader :perimeter, :width, :height, :start_x, :start_y
 	
 	
-	def initialize(floor_num)
-		# Set the seed here for seeded games
-		# seed = 1024768
-		# Random.srand(seed)
-		
-		seed = srand()
-		srand(seed)
-		Logger.info("This is game ##{seed}")
-				
-		@floor_num = floor_num		
+	def initialize(floor)				
+		@floor = floor
 		@width = 80
 		@height = 25
 		@perimeter = true
@@ -23,6 +15,10 @@ class Dungeon
 		@start_y = 5
 		
 		generate_topology
+	end
+	
+	def add_wall(x, y)
+		@walls << [x, y]
 	end
 	
 	private 
@@ -61,7 +57,7 @@ class Dungeon
 		# Convert to map data		
 		new_walls.each do |x, map|
 			map.each do |y, is_wall| 
-				@walls << [x, y] if is_wall == true
+				@walls << [x, y] if is_wall == true || is_on_perimeter?(x, y)
 			end
 		end
 		
@@ -70,13 +66,19 @@ class Dungeon
 		
 		# Populate stairs
 		target = {:x => last_seen[:x], :y => last_seen[:y]}
-		while (target[:x] == @start_x && target[:y] == @start_y) do
+		while (
+			(target[:x] == @start_x && target[:y] == @start_y) || # Not on the player start
+			(walls.include?([target[:x], target[:y]])) # Not on a wall
+		) do
 			room = rooms[rand(rooms.length)]
 			target[:x] = room[:x]
 			target[:y] = room[:y]
 		end
 		
+		#Logger.debug("Walls.include?(#{target[:x]}, #{target[:y]}) == #{(walls.include?([target[:x], target[:y]]))}")
+		Logger.debug("Walls=#{walls}")
 		Logger.debug("Stairs are at #{target}")
+		@stairs = {'x' => target[:x], 'y' => target[:y]}
 	end
 	
 	def make_circle(x, y, radius, walls, filled)
@@ -99,6 +101,10 @@ class Dungeon
 		if !random_point.nil?
 			make_circle(random_point[:x], random_point[:y], radius / 2, walls, true)
 		end
+	end
+	
+	def is_on_perimeter?(x, y)
+		return @perimeter == true && (x == 0 || y == 0 || x == @width - 1 || y == @height - 1)
 	end
 end
 

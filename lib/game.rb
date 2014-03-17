@@ -13,7 +13,15 @@ class Game
 
 	attr_reader :current_map
 	
-	def initialize
+	def initialize	
+		# Set the seed here for seeded games
+		# seed = 1024768
+		# Random.srand(seed)
+		
+		seed = 187710140345960790538626463227933616686 #srand()
+		srand(seed)
+		Logger.info("This is game ##{seed}")
+		
 		@display = DisplaySystem.new
 		@input = InputSystem.new
 	end
@@ -79,12 +87,6 @@ class Game
 		
 		if map.respond_to?('perimeter') && map.perimeter == true
 			(0 .. map.width).each do |x|
-				# NOT classes. Wall is a bunch of components and data.
-				# Components = DisplayComponent(x, y, char, color)
-				# That's all data. There's no code here. Yet.
-				# Old-style would be to have a MoveComponent instance in Player entity.
-				# NewStyle is an empty "move" tag in the entity, and the MoveSystem operates on that.
-				
 				# TODO: we have some common entities (eg. walls) and components (eg. display), irrespective of game content
 				# TODO: move this into a standard place for construction
 				entities << Entity.new({ :x => x, :y => 0, :character => '#', :color => grey })
@@ -114,7 +116,7 @@ class Game
 		if map.respond_to?('walls') && !map.walls.nil? then				
 			white = Color.new(255, 255, 255)
 			map.walls.each do |w|
-				entities << Entity.new({ :x => w[0], :y => w[1], :character => "#", :color => white })
+				entities << Entity.new({ :x => w[0], :y => w[1], :character => "#", :color => grey })
 			end
 		end
 		
@@ -138,7 +140,7 @@ class Game
 		
 		# Pass entities to our systems	
 		@display.init(@entities) # replace map with entities
-		@input.init(@entities, player)
+		@input.init(@entities)
 		
 		@display.fill_screen('.', Color.new(128, 128, 128))
 	end
