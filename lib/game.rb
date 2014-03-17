@@ -44,9 +44,10 @@ class Game
 			@component_definitions = game_data.components
 			
 			# Load the starting map.
-			@current_map = OpenStruct.new(JSON.parse(File.read("data/maps/#{game_data.starting_map}")))
-			@current_map.floor = 0
-			change_map(@current_map)
+			@town = OpenStruct.new(JSON.parse(File.read("data/maps/#{game_data.starting_map}")))
+			@town.floor = 0
+			change_map(@town)
+			@current_map = @town
 			@display.clear # change_map draws dots, but we can't init the display any later
 			
 			audio = AudioManager.new() # Convert to audio System; pass entities
@@ -100,10 +101,28 @@ class Game
 		end
 		
 		if map.respond_to?('stairs') && !map.stairs.nil? then
-			entities << Entity.new({
-				:solid => false, :x => map.stairs['x'], :y => map.stairs['y'], :character => ">", :color => Color.new(255, 255, 255),
-				:input => InputComponent.new(Proc.new { |input| change_map(Dungeon.new(@current_map.floor + 1)) if input == '>' })
-			})			
+			Logger.debug("Stairs are #{map.stairs}")
+			if map.stairs.class.name != 'Array'			
+				# single object
+				map.stairs = [map.stairs]
+			end
+			
+			map.stairs.each do |s|								
+				if s.has_key?('direction') && s['direction'].downcase == 'up' then
+					input = InputComponent.new(Proc.new { |input| change_floor(@current_map.floor - 1) if input == '<' })
+					c = '<'
+				else					
+					input = InputComponent.new(Proc.new { |input| change_floor(@current_map.floor + 1) if input == '>' })
+					c = '>'
+				end
+				
+				e = Entity.new({
+					:solid => false, :x => s['x'], :y => s['y'], :character => c,
+					:color => Color.new(255, 255, 255), :input => input			
+				})
+				
+				entities << e
+			end
 		end
 		
 		if map.respond_to?('npcs') && !map.npcs.nil?
@@ -130,6 +149,14 @@ class Game
 		entities << player
 		
 		return entities
+	end
+	
+	def change_floor(floor_num)
+		if floor_num > 0
+			change_map(Dungeon.new(floor_num))
+		else
+			change_map(@town)
+		end
 	end
 	
 	def change_map(new_map)

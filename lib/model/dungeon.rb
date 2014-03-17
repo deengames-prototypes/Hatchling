@@ -64,7 +64,7 @@ class Dungeon
 		@start_x = last_seen[:x]
 		@start_y = last_seen[:y]
 		
-		# Populate stairs
+		# Populate stairs down
 		target = {:x => last_seen[:x], :y => last_seen[:y]}
 		while (
 			(target[:x] == @start_x && target[:y] == @start_y) || # Not on the player start
@@ -75,9 +75,11 @@ class Dungeon
 			target[:x] = room[:x]
 			target[:y] = room[:y]
 		end
-				
-		Logger.debug("Stairs are at #{target}")
-		@stairs = {'x' => target[:x], 'y' => target[:y]}
+		
+		@stairs = [
+			{'x' => target[:x], 'y' => target[:y]},
+			{'x' => @start_x, 'y' => @start_y, 'direction' => 'up'}
+		]
 	end
 	
 	def make_circle(x, y, radius, walls, filled)
