@@ -18,7 +18,7 @@ class Game
 		# seed = 1024768
 		# Random.srand(seed)
 		
-		seed = 187710140345960790538626463227933616686 #srand()
+		seed = srand()
 		srand(seed)
 		Logger.info("This is game ##{seed}")
 		

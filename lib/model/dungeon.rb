@@ -68,15 +68,14 @@ class Dungeon
 		target = {:x => last_seen[:x], :y => last_seen[:y]}
 		while (
 			(target[:x] == @start_x && target[:y] == @start_y) || # Not on the player start
-			(walls.include?([target[:x], target[:y]])) # Not on a wall
+			(walls.include?([target[:x], target[:y]]))  || # Not on a wall
+			(g.distance(target[:x], target[:y], @start_x, @start_y) <= 225) # Not too close; 15 squares
 		) do
 			room = rooms[rand(rooms.length)]
 			target[:x] = room[:x]
 			target[:y] = room[:y]
 		end
-		
-		#Logger.debug("Walls.include?(#{target[:x]}, #{target[:y]}) == #{(walls.include?([target[:x], target[:y]]))}")
-		Logger.debug("Walls=#{walls}")
+				
 		Logger.debug("Stairs are at #{target}")
 		@stairs = {'x' => target[:x], 'y' => target[:y]}
 	end
