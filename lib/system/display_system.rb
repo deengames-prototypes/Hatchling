@@ -22,9 +22,10 @@ class DisplaySystem
 		@old_positions = []
 		
 		@entities.each do |e|			
-			if e.has?(:character) && e.has?(:color) && is_on_screen?(e.x, e.y)
-				@display.draw(e.x, e.y, e.character, e.color)
-				@old_positions << { :x => e.x, :y => e.y }
+			if e.has?(:display)
+				d = e.get(:display)
+				@display.draw(d.x, d.y, d.character, d.color)
+				@old_positions << { :x => d.x, :y => d.y }
 			end
 		end		
 	end	

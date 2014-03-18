@@ -6,13 +6,14 @@ class InputSystem
 	def init(entities)		
 		@entities = entities
 		@entities.each do |e|
-			if e.respond_to?(:name) && e.name.downcase == 'player'
+			if e.has?(:name) && e.name.downcase == 'player'
 				@player = e
+				Logger.debug("P=#{@player}")
 				break
 			end			
 		end
 		
-		raise 'Can\'t find player in entities' if @player.nil
+		raise 'Can\'t find player in entities' if @player.nil?
 	end	
 	
 	def destroy
@@ -24,7 +25,7 @@ class InputSystem
 	
 	def get_and_process_input			
 		input = Keys.read_character
-		target = OpenStruct.new({ x: @player.x, y: @player.y })
+		target = OpenStruct.new({ x: @player.get(:display).x, y: @player.get(:display).y })
 		if (input == 'up') then
 			target.y -= 1
 		elsif (input == 'down') then
@@ -38,20 +39,20 @@ class InputSystem
 		e = entity_at(target.x, target.y)
 		
 		if e.nil? || (e.has?(:solid) && e.solid == false)
-			@player.x = target.x
-			@player.y = target.y			
+			@player.get(:display).x = target.x
+			@player.get(:display).y = target.y			
 		end
 		
-		if (!e.nil?)			
-			e.process_input(input)
+		if (!e.nil? && e.has?(:input))			
+			e.get(:input).process_input(input)
 		end
 		
-		return input		
+		return input
 	end
 	
 	def entity_at(x, y)		
 		@entities.each do |e|
-			return e if x == e.x && y == e.y && e != @player
+			return e if e.has?(:display) && e.get(:display).x == x && e.get(:display).y == y && e != @player
 		end		
 		
 		return nil

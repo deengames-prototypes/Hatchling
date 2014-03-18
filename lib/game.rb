@@ -1,12 +1,14 @@
-require 'ostruct'
 require_relative 'system/display_system'
 require_relative 'system/input_system'
 require_relative 'io/audio_manager'
 require_relative 'io/keys'
 require_relative 'utils/color'
 require_relative 'model/entity'
+require_relative 'component/display_component'
 require_relative 'component/input_component'
 require_relative 'model/dungeon'
+
+require 'ostruct'
 require 'json'
 
 class Game
@@ -90,13 +92,13 @@ class Game
 			(0 .. map.width).each do |x|
 				# TODO: we have some common entities (eg. walls) and components (eg. display), irrespective of game content
 				# TODO: move this into a standard place for construction
-				entities << Entity.new({ :x => x, :y => 0, :character => '#', :color => grey })
-				entities << Entity.new({ :x => x, :y => map.height - 1, :character => '#', :color => grey })
+				entities << Entity.new({ :display => DisplayComponent.new(x, 0, '#', grey) })
+				entities << Entity.new({ :display => DisplayComponent.new(x, map.height - 1, '#', grey) })
 			end
 						
 			(0 .. map.height).each do |y|
-				entities << Entity.new({ :x => 0, :y => y, :character => '#', :color => grey })
-				entities << Entity.new({ :x => map.width - 1, :y => y, :character => '#', :color => grey })
+				entities << Entity.new({ :display => DisplayComponent.new(0, y, '#', grey) })
+				entities << Entity.new({ :display => DisplayComponent.new(map.width - 1, y, '#', grey) })
 			end
 		end
 		
@@ -117,9 +119,10 @@ class Game
 				end
 				
 				e = Entity.new({
-					:solid => false, :x => s['x'], :y => s['y'], :character => c,
-					:color => Color.new(255, 255, 255), :input => input			
-				})
+					:display => DisplayComponent.new(s['x'], s['y'], c, Color.new(255, 255, 255)),
+					:input => input,
+					:solid => false
+				})				
 				
 				entities << e
 			end
@@ -127,15 +130,14 @@ class Game
 		
 		if map.respond_to?('npcs') && !map.npcs.nil?
 			(map.npcs).each do |npc|				
-				entities << Entity.new({ :x => npc['x'], :y => npc['y'], :character => '@',
-				:color => Color.new(npc['color']['r'], npc['color']['g'], npc['color']['b'])})
+				entities << Entity.new({ :display => DisplayComponent.new(npc['x'], npc['y'], '@', Color.new(npc['color']['r'], npc['color']['g'], npc['color']['b']))})
 			end
 		end
 		
 		if map.respond_to?('walls') && !map.walls.nil? then				
 			white = Color.new(255, 255, 255)
 			map.walls.each do |w|
-				entities << Entity.new({ :x => w[0], :y => w[1], :character => "#", :color => grey })
+				entities << Entity.new({ :display => DisplayComponent.new(w[0], w[1], '#', grey) })
 			end
 		end
 		
@@ -143,8 +145,8 @@ class Game
 			# For identification
 			:name => 'Player',
 			# Display properties
-			:x => map.start_x.to_i, :y => map.start_y.to_i, :character => "@", :color => Color.new(255, 192, 32)
-		})		
+			:display => DisplayComponent.new(map.start_x.to_i, map.start_y.to_i, '@', Color.new(255, 192, 32))
+		})
 		
 		entities << player
 		
