@@ -1,6 +1,7 @@
 # Some sort of dynamic object, like C#'s ExpandoObject, or like OpenStruct.
 # It's a class that has dynamic properties. They're specified through a hash.
 # It's insensitive to strings vs. symbols, since JSON gives us symbols.
+# If you add a "display" component, access it via entity.get(:display)
 class Entity 
 
 	def initialize(hash)
@@ -22,6 +23,7 @@ class Entity
 		return @properties[key]
 	end
 	
+	# TO
 	def method_missing(method, *args, &block)
 		key = normalize_key(method)
 		# Setter
@@ -35,17 +37,9 @@ class Entity
 		end
 	end
 	
-	def peekz
-		@properties
-	end
-	
 	private
 	
 	def normalize_key(key)
-		if key.class.name == 'String'
-			return key.to_sym 
-		else
-			return key
-		end
+		key.to_sym
 	end
 end

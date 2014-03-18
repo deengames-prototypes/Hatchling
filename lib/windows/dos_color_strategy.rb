@@ -1,9 +1,13 @@
 require_relative '../utils/color'
+require_relative '../utils/logger'
 
 class DosColorStrategy	
 
 	def initialize
 		@rgb_to_index = { }
+		
+		# Yes, it is surprisingly expensive
+		@distance_cache = {}
 		
 		@colors = [
 			Color.new(0, 0, 0),
@@ -54,7 +58,13 @@ class DosColorStrategy
 	end
 	
 	def compute_distance(src, target)
-		return (src.r - target.r)**2 + (src.g - target.g)**2 + (src.b - target.b)**2
+		cache_key = "#{src.r} #{src.g} #{src.b} #{target.r} #{target.g} #{target.b}"
+		
+		if !@distance_cache.has_key?(cache_key)
+			@distance_cache[cache_key] = (src.r - target.r)**2 + (src.g - target.g)**2 + (src.b - target.b)**2
+		end
+		
+		return @distance_cache[cache_key] 
 	end
 	
 end
