@@ -31,7 +31,15 @@ class DisplaySystem
 				end
 				
 				if draw == true					
-					@display.draw(previous.x, previous.y, '.', Color.new(128, 128, 128)) if !previous.nil?
+					if !previous.nil?					
+						p = self.entity_at(previous.x, previous.y)
+						if p.nil?							
+							@display.draw(previous.x, previous.y, '.', Color.new(128, 128, 128))
+						else
+							p = p.get(:display)
+							@display.draw(p.x, p.y, p.character, p.color)
+						end
+					end
 					
 					@display.draw(d.x, d.y, d.character, d.color)
 					
@@ -55,6 +63,15 @@ class DisplaySystem
 				@display.draw(x, y, character, color)
 			end
 		end
+	end
+	
+	# Copied from input_system.rb. TODO: DRY
+	def entity_at(x, y)		
+		@entities.each do |e|
+			return e if e.has?(:display) && e.get(:display).x == x && e.get(:display).y == y && e != @player
+		end		
+		
+		return nil
 	end
 	
 	private
