@@ -46,7 +46,4 @@ class HealthComponentTest < Test::Unit::TestCase
 		h.get_hurt(1)
 		assert_equal(false, h.is_alive?)
 	end
-	
-	def test_is_alive_is_false_with_zero_or_negative_health
-	end
 end

@@ -7,7 +7,7 @@ class MonsterTest < Test::Unit::TestCase
 		m = Monster.new(10, 13, :drone)
 		
 		# Check for components
-		[:display, :strength, :health].each do |c|
+		[:display, :battle, :health].each do |c|
 			assert(m.has?(c))
 		end		
 		
@@ -17,7 +17,10 @@ class MonsterTest < Test::Unit::TestCase
 		assert_equal(13, d.y)
 		assert_equal('d', d.character)
 		
-		assert(m.get(:strength) > 0)
+		b = m.get(:battle)
+		assert_not_nil(b)
+		assert(b.strength > 1)
+		assert(b.speed >= 1)
 		
 		h = m.get(:health)
 		assert_not_nil(h)

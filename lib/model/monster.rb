@@ -1,6 +1,7 @@
 require_relative 'entity'
 require_relative '../component/health_component'
 require_relative '../component/display_component'
+require_relative '../component/battle_component'
 require_relative '../utils/color'
 require_relative '../utils/logger'
 
@@ -17,13 +18,14 @@ class Monster < Entity
 		case type
 		when :drone
 			health = 15 + rand(5)
-			strength = 4 + rand(2)
+			strength = 2 + rand(1)
+			speed = 1
 		else
 			raise "Not sure how to make a monster of type #{type}"
 		end
 		
 		components[:health] = HealthComponent.new(health)
-		components[:strength] = strength
+		components[:battle] = BattleComponent.new(strength, speed)
 				
 		super(components)
 	end
