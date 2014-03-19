@@ -1,8 +1,9 @@
 require_relative '../utils/logger'
 
 class Dungeon
-	attr_reader :stairs, :walls, :floor # TODO: replace with generic list
-	attr_reader :perimeter, :width, :height, :start_x, :start_y
+	attr_reader :stairs, :walls # TODO: replace with generic list
+	attr_reader :perimeter, :width, :height, :start_x, :start_y, :floor 
+	attr_accessor :entities # the new generic list, see TODO above
 	
 	
 	def initialize(floor)				
@@ -10,11 +11,10 @@ class Dungeon
 		@width = 80
 		@height = 25
 		@perimeter = true
-		
-		@start_x = 5
-		@start_y = 5
+		@entities = []
 		
 		generate_topology
+		generate_monsters
 	end
 	
 	def add_wall(x, y)
@@ -22,6 +22,14 @@ class Dungeon
 	end
 	
 	private 
+	
+	def generate_monsters
+		m = rand(5) + 5
+		(1..m).each do |i|
+			xy = find_empty_spot
+			@entities << Entity.new({ :display => DisplayComponent.new(xy[:x], xy[:y], 'd', Color.new(0, 255, 0)) })
+		end
+	end
 	
 	def generate_topology
 		# Fill 'er up!
@@ -107,7 +115,46 @@ class Dungeon
 	def is_on_perimeter?(x, y)
 		return @perimeter == true && (x == 0 || y == 0 || x == @width - 1 || y == @height - 1)
 	end
+	
+	# Find an empty spot: no stairs, no walls there.
+	# Also, nothing is close by (see in_proximity)
+	def find_empty_spot	
+		check_against = []
+		
+		# Why isn't this standardized?
+		@stairs.each do |s|
+			check_against << { :x => s['x'], :y => s['y'] }
+		end
+		@walls.each do |w|
+			check_against << { :x => w[0], :y => w[1] }
+		end
+		@entities.each do |e|
+			check_against << { :x => e.get(:display).x, :y => e.get(:display).y }
+		end
+		
+		x = check_against[0][:x]
+		y = check_against[0][:y]
+		
+		while check_against.include?({:x => x, :y => y}) || in_proximity(x, y, @entities, 5) do
+			x = rand(@width)
+			y = rand(@height)
+		end
+		
+		return {:x => x, :y => y}
+	end
+	
+	# Make sure (x, y) is within range tiles of entities
+	def in_proximity(x, y, entities, range)
+		entities.each do |e|
+			d = e.get(:display)
+			return true if (d.x - x)**2 + (d.y - y)**2 <= range**2
+		end
+		
+		return false
+	end
 end
+
+############# helper class ############
 
 class GraphOperator	
 	def initialize(width, height, rooms, new_walls, player_start)

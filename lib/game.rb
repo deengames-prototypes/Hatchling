@@ -17,7 +17,7 @@ class Game
 	
 	def initialize	
 		# Set the seed here for seeded games
-		# seed = 1024768
+		# seed = 97036811854866721022854352350067878287
 		# Random.srand(seed)
 		
 		seed = srand()
@@ -149,6 +149,12 @@ class Game
 		})
 		
 		entities << player
+		
+		if map.respond_to?('entities') && !map.entities.nil?
+			map.entities.each do |e|
+				entities << e
+			end
+		end
 		
 		return entities
 	end
