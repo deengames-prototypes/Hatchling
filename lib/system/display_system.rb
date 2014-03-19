@@ -16,8 +16,6 @@ class DisplaySystem
 	end
 
 	def draw
-		count = 0
-		
 		@entities.each do |e|			
 			if e.has?(:display)
 				d = e.get(:display)
@@ -32,19 +30,15 @@ class DisplaySystem
 					draw = true if previous.x != d.x || previous.y != d.y || previous.color != d.color || previous.character != d.character
 				end
 				
-				if draw == true
-					if !previous.nil?
-						@display.draw(previous.x, previous.y, '.', Color.new(128, 128, 128)) 
-						count += 1
-					end
+				if draw == true					
+					@display.draw(previous.x, previous.y, '.', Color.new(128, 128, 128)) if !previous.nil?
+					
 					@display.draw(d.x, d.y, d.character, d.color)
-					@previous_state[e] = DisplayComponent.new(d.x, d.y, d.character, d.color)
-					count += 1
+					
+					@previous_state[e] = DisplayComponent.new(d.x, d.y, d.character, d.color)					
 				end
 			end
 		end
-		
-		Logger.debug("Redrew #{count} characters")
 	end	
 	
 	def draw_text(x, y, text, color)

@@ -1,5 +1,5 @@
 require 'json'
-require 'ruby-prof'
+#require 'ruby-prof'
 
 # Load the game.
 if (!File.exists?('data/game.json')) then
@@ -14,9 +14,9 @@ require_relative 'game'
 Logger.init(game_name)
 Logger.info('Starting game ...')
 
-result = RubyProf.profile do
+#result = RubyProf.profile do
 	Game.new.start
-end
+#end
 
 File.open('flat.txt', 'w') do |f|
 	printer = RubyProf::FlatPrinter.new(result)
