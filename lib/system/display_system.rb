@@ -1,6 +1,7 @@
 require_relative '../io/display'
 require_relative '../utils/logger'
 
+### The display system for your game. This code is game specific.
 class DisplaySystem	
 	
 	def init(entities)

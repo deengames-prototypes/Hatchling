@@ -1,5 +1,7 @@
 require_relative '../utils/logger'
+require_relative 'monster'
 
+### A randomly-generated dungeon. This code is game specific.
 class Dungeon
 	attr_reader :stairs, :walls # TODO: replace with generic list
 	attr_reader :perimeter, :width, :height, :start_x, :start_y, :floor 
@@ -26,8 +28,8 @@ class Dungeon
 	def generate_monsters
 		m = rand(5) + 5
 		(1..m).each do |i|
-			xy = find_empty_spot
-			@entities << Entity.new({ :display => DisplayComponent.new(xy[:x], xy[:y], 'd', Color.new(0, 255, 0)) })
+			coordinates = find_empty_spot
+			@entities << Monster.new(coordinates[:x], coordinates[:y], :drone)
 		end
 	end
 	
