@@ -1,9 +1,12 @@
 require_relative '../io/display'
+require_relative '../utils/logger'
 
 class DisplaySystem	
 	
 	def init(entities)
-		@old_positions = []
+		# Draw only things that moved; draw a '.' on their old position,
+		# and draw them at their new position.
+		@previous_state = {}
 		@entities = entities
 		@display = Display.new if @display.nil?
 	end	
@@ -13,21 +16,35 @@ class DisplaySystem
 	end
 
 	def draw
-		# Clear out their old occupied spaces
-		@old_positions.each do |e|
-			# TODO: draw the floor that was here
-			@display.draw(e[:x], e[:y], '.', Color.new(128, 128, 128))			
-		end
-		
-		@old_positions = []
+		count = 0
 		
 		@entities.each do |e|			
 			if e.has?(:display)
 				d = e.get(:display)
-				@display.draw(d.x, d.y, d.character, d.color)
-				@old_positions << { :x => d.x, :y => d.y }
+				draw = false
+				previous = nil
+				
+				# Didn't draw you before?
+				draw = true if !@previous_state.has_key?(e)
+				# Did you move?
+				if @previous_state.has_key?(e)
+					previous = @previous_state[e]
+					draw = true if previous.x != d.x || previous.y != d.y || previous.color != d.color || previous.character != d.character
+				end
+				
+				if draw == true
+					if !previous.nil?
+						@display.draw(previous.x, previous.y, '.', Color.new(128, 128, 128)) 
+						count += 1
+					end
+					@display.draw(d.x, d.y, d.character, d.color)
+					@previous_state[e] = DisplayComponent.new(d.x, d.y, d.character, d.color)
+					count += 1
+				end
 			end
-		end		
+		end
+		
+		Logger.debug("Redrew #{count} characters")
 	end	
 	
 	def draw_text(x, y, text, color)
