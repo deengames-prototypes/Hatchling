@@ -131,7 +131,7 @@ class Dungeon
 			check_against << { :x => w[0], :y => w[1] }
 		end
 		@entities.each do |e|
-			check_against << { :x => e.get(:display).x, :y => e.get(:display).y }
+			check_against << { :x => e.get(:display).x, :y => e.get(:display).y }			
 		end
 		
 		x = check_against[0][:x]

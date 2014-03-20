@@ -8,7 +8,6 @@ class InputSystem
 		@entities.each do |e|
 			if e.has?(:name) && e.name.downcase == 'player'
 				@player = e
-				Logger.debug("P=#{@player}")
 				break
 			end			
 		end
@@ -47,7 +46,7 @@ class InputSystem
 			e.get(:input).process_input(input)
 		end
 		
-		return input
+		return {:key => input}
 	end
 	
 	def entity_at(x, y)		

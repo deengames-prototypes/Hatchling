@@ -1,5 +1,6 @@
 require_relative 'system/display_system'
 require_relative 'system/input_system'
+require_relative 'system/battle_system'
 require_relative 'io/audio_manager'
 require_relative 'io/keys'
 require_relative 'utils/color'
@@ -17,8 +18,8 @@ class Game
 	
 	def initialize	
 		# Set the seed here for seeded games
-		# seed = 97036811854866721022854352350067878287
-		# Random.srand(seed)
+		seed = 197833207045388058134724844060940480178
+		Random.srand(seed)
 		
 		seed = srand()
 		srand(seed)
@@ -26,6 +27,8 @@ class Game
 		
 		@display = DisplaySystem.new
 		@input = InputSystem.new
+		@battle = BattleSystem.new
+		@systems = [@display, @input, @battle]
 	end
 	
 	def start
@@ -63,7 +66,7 @@ class Game
 			if (!game_data.story.nil?) then
 				@display.clear				
 				@display.draw_text(0, 0, game_data.story, Color.new(192, 192, 192))
-				@input.get_input
+				@input.get_input				
 			end
 			
 			# Start drawing the main map
@@ -74,12 +77,15 @@ class Game
 			while (!quit) do
 				@display.draw
 				input = @input.get_and_process_input
-				quit = (input == 'q' || input == 'escape')				
+				@battle.process(input)
+				quit = (input[:key] == 'q' || input[:key] == 'escape')
 			end
 			Logger.info('Normal termination')
 		rescue StandardError => e
 			Logger.info("Termination by error: #{e}\n#{e.backtrace}")
-			@display.destroy unless @display.nil?
+			@systems.each do |s|
+				s.destroy unless s.nil? || !s.respond_to?(:destroy)
+			end
 			raise # Re-raise after cleaning up
 		end
 	end
@@ -101,6 +107,13 @@ class Game
 				entities << Entity.new({ :display => DisplayComponent.new(map.width - 1, y, '#', grey) })
 			end
 		end
+		
+		player = Entity.new({
+			# For identification
+			:name => 'Player',
+			# Display properties
+			:display => DisplayComponent.new(map.start_x.to_i, map.start_y.to_i, '@', Color.new(255, 192, 32))
+		})		
 		
 		if map.respond_to?('stairs') && !map.stairs.nil? then
 			Logger.debug("Stairs are #{map.stairs}")
@@ -141,20 +154,14 @@ class Game
 			end
 		end
 		
-		player = Entity.new({
-			# For identification
-			:name => 'Player',
-			# Display properties
-			:display => DisplayComponent.new(map.start_x.to_i, map.start_y.to_i, '@', Color.new(255, 192, 32))
-		})
-		
-		entities << player
-		
 		if map.respond_to?('entities') && !map.entities.nil?
 			map.entities.each do |e|
 				entities << e
-			end
+			end			
 		end
+		
+		# Draw last
+		entities << player
 		
 		return entities
 	end
@@ -169,13 +176,13 @@ class Game
 	
 	def change_map(new_map)
 		@current_map = new_map
-		
 		@entities = create_entities_for(@current_map)			
-		player = @entities.find { |e| e.has?(:name) && e.name == 'Player' }
+		player = @entities.find { |e| e.has?(:name) && e.name == 'Player' }		
 		
 		# Pass entities to our systems	
-		@display.init(@entities) # replace map with entities
-		@input.init(@entities)
+		@systems.each do |s|
+			s.init(@entities)
+		end
 		
 		@display.fill_screen('.', Color.new(128, 128, 128))
 	end

@@ -18,6 +18,11 @@ class DisplaySystem
 
 	def draw
 		@entities.each do |e|			
+			if e.respond_to?(:name) && e.name.downcase == 'player' then
+				player = e
+				next
+			end
+			
 			if e.has?(:display)
 				d = e.get(:display)
 				draw = false
