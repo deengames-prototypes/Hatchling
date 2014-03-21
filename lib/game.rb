@@ -122,7 +122,7 @@ class Game
 				map.stairs = [map.stairs]
 			end
 			
-			map.stairs.each do |s|								
+			map.stairs.each do |s|
 				if s.has_key?('direction') && s['direction'].downcase == 'up' then
 					input = InputComponent.new(Proc.new { |input| change_floor(@current_map.floor - 1) if input == '<' })
 					c = '<'
@@ -176,8 +176,7 @@ class Game
 	
 	def change_map(new_map)
 		@current_map = new_map
-		@entities = create_entities_for(@current_map)			
-		player = @entities.find { |e| e.has?(:name) && e.name == 'Player' }		
+		@entities = create_entities_for(@current_map)
 		
 		# Pass entities to our systems	
 		@systems.each do |s|

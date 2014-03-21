@@ -118,8 +118,7 @@ class Dungeon
 		return @perimeter == true && (x == 0 || y == 0 || x == @width - 1 || y == @height - 1)
 	end
 	
-	# Find an empty spot: no stairs, no walls there.
-	# Also, nothing is close by (see in_proximity)
+	# Find an empty spot: no stairs, nothing is close by (see in_proximity)
 	def find_empty_spot	
 		check_against = []
 		
@@ -127,9 +126,7 @@ class Dungeon
 		@stairs.each do |s|
 			check_against << { :x => s['x'], :y => s['y'] }
 		end
-		@walls.each do |w|
-			check_against << { :x => w[0], :y => w[1] }
-		end
+		
 		@entities.each do |e|
 			check_against << { :x => e.get(:display).x, :y => e.get(:display).y }			
 		end
@@ -137,7 +134,9 @@ class Dungeon
 		x = check_against[0][:x]
 		y = check_against[0][:y]
 		
-		while check_against.include?({:x => x, :y => y}) || in_proximity(x, y, @entities, 5) do
+		Logger.debug("Checking against #{check_against.length} entities: #{check_against}")
+		while check_against.include?({:x => x, :y => y}) || in_proximity(x, y, check_against, 5) || walls.include?([x, y]) do
+			Logger.debug("Iterating.")
 			x = rand(@width)
 			y = rand(@height)
 		end
@@ -147,9 +146,11 @@ class Dungeon
 	
 	# Make sure (x, y) is within range tiles of entities
 	def in_proximity(x, y, entities, range)
-		entities.each do |e|
-			d = e.get(:display)
-			return true if (d.x - x)**2 + (d.y - y)**2 <= range**2
+		entities.each do |e|			
+			distance = (e[:x] - x)**2 + (e[:y] - y)**2			
+			if distance <= range**2 then
+				return true 
+			end
 		end
 		
 		return false
