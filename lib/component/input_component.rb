@@ -1,4 +1,6 @@
-class InputComponent
+require_relative 'base_component'
+
+class InputComponent < BaseComponent
 	def initialize(callback)
 		@callback = callback
 	end

@@ -1,4 +1,6 @@
-class HealthComponent
+require_relative 'base_component'
+
+class HealthComponent < BaseComponent
 	attr_reader :current_health, :max_health
 	
 	def initialize(max_health)

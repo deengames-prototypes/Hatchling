@@ -23,7 +23,31 @@ class Dungeon
 		@walls << [x, y]
 	end
 	
+	
+	def is_valid_move?(move)
+		return !all_entities.include?({:x => move[:x], :y => move[:y]})
+	end
+	
 	private 
+	
+	# TODO: very expensive
+	def all_entities
+		to_return = []
+		
+		@stairs.each do |s|
+			to_return << { :x => s['x'], :y => s['y'] }
+		end
+		
+		@entities.each do |e|
+			to_return << { :x => e.get(:display).x, :y => e.get(:display).y }			
+		end
+		
+		@walls.each do |w|
+			to_return << { :x => w[0], :y => w[1] }			
+		end
+		
+		return to_return
+	end
 	
 	def generate_monsters
 		m = rand(5) + 5
@@ -133,10 +157,8 @@ class Dungeon
 		
 		x = check_against[0][:x]
 		y = check_against[0][:y]
-		
-		Logger.debug("Checking against #{check_against.length} entities: #{check_against}")
+				
 		while check_against.include?({:x => x, :y => y}) || in_proximity(x, y, check_against, 5) || walls.include?([x, y]) do
-			Logger.debug("Iterating.")
 			x = rand(@width)
 			y = rand(@height)
 		end

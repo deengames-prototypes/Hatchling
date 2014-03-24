@@ -1,3 +1,5 @@
+require_relative '../utils/logger'
+
 # The basic battle system. Don't change it, extend it.
 # Uses minimal dependencies (battle component)
 class BattleSystem
@@ -18,6 +20,17 @@ class BattleSystem
 	end
 
 	def process(input)
+		if input.has_key?(:target) && ['up', 'right', 'down', 'left'].include?(input)
+			# Dear player, please ATTACK! ATTACK! ATTACK! the enemy. kthxbye.
+		end
+		
+		@entities.each do |e|
+			next if @player == e
+			if e.has?(:battle) then
+				move = e.get(:battle).pick_move
+				e.get(:display).move(move)  if Game.instance.current_map.is_valid_move?(move)					
+			end
+		end
 	end
 	
 end

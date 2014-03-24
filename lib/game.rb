@@ -14,21 +14,28 @@ require 'json'
 
 class Game
 
-	attr_reader :current_map
+	attr_reader :current_map, :player
+	
+	@@instance = nil	
 	
 	def initialize	
 		# Set the seed here for seeded games
-		seed = 197833207045388058134724844060940480178
+		seed = 289538379890027845966326158351430095932
 		Random.srand(seed)
 		
 		seed = srand()
 		srand(seed)
 		Logger.info("This is game ##{seed}")
 		
+		@@instance = self
 		@display = DisplaySystem.new
 		@input = InputSystem.new
 		@battle = BattleSystem.new
 		@systems = [@display, @input, @battle]
+	end
+	
+	def self.instance
+		@@instance
 	end
 	
 	def start
@@ -108,7 +115,7 @@ class Game
 			end
 		end
 		
-		player = Entity.new({
+		@player = Entity.new({
 			# For identification
 			:name => 'Player',
 			# Display properties
@@ -161,7 +168,7 @@ class Game
 		end
 		
 		# Draw last
-		entities << player
+		entities << @player
 		
 		return entities
 	end

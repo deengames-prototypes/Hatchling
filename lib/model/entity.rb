@@ -1,3 +1,6 @@
+require_relative '../utils/logger'
+require_relative '../component/base_component'
+
 # Some sort of dynamic object, like C#'s ExpandoObject, or like OpenStruct.
 # It's a class that has dynamic properties. They're specified through a hash.
 # It's insensitive to strings vs. symbols, since JSON gives us symbols.
@@ -8,6 +11,7 @@ class Entity
 		symbols_only = {}
 		hash.each do |k, v|
 			symbols_only[k.to_sym] = v
+			v.entity = self if v.is_a?(BaseComponent)			
 		end
 				
 		@properties = symbols_only
@@ -22,8 +26,7 @@ class Entity
 		key = normalize_key(key)
 		return @properties[key]
 	end
-	
-	# TO
+		
 	def method_missing(method, *args, &block)
 		key = normalize_key(method)
 		# Setter

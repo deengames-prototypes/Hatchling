@@ -46,7 +46,9 @@ class InputSystem
 			e.get(:input).process_input(input)
 		end
 		
-		return {:key => input}
+		result = {:key => input}
+		result[:target] = e unless e.nil?		
+		return result
 	end
 	
 	def entity_at(x, y)		
