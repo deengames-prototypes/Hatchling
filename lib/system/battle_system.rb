@@ -27,10 +27,19 @@ class BattleSystem
 		@entities.each do |e|
 			next if @player == e
 			if e.has?(:battle) then
-				move = e.get(:battle).pick_move
-				e.get(:display).move(move)  if Game.instance.current_map.is_valid_move?(move)					
+				move = e.get(:battle).pick_move				
+				if is_valid_move?(move)					
+					e.get(:display).move(move)					
+				end
 			end
 		end
 	end
 	
+	def is_valid_move?(move)		
+		is_valid = true
+		is_valid &= Game.instance.current_map.is_valid_move?(move)
+		player_pos = @player.get(:display)
+		is_valid &= (player_pos.x != move[:x] || player_pos.y != move[:y])
+		return is_valid
+	end
 end

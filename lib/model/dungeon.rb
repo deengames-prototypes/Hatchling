@@ -50,7 +50,7 @@ class Dungeon
 	end
 	
 	def generate_monsters
-		m = rand(5) + 5
+		m = 1#rand(5) + 5
 		(1..m).each do |i|
 			coordinates = find_empty_spot
 			@entities << Monster.new(coordinates[:x], coordinates[:y], :drone)
