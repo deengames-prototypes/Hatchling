@@ -10,6 +10,7 @@ class DisplaySystem
 		@previous_state = {}
 		@entities = entities
 		@display = Display.new if @display.nil?
+		@messages = ['hi', 'ho', 'silver!', 'AWAY!']
 	end	
 	
 	def destroy
@@ -40,19 +41,22 @@ class DisplaySystem
 					if !previous.nil?					
 						p = self.entity_at(previous.x, previous.y)
 						if p.nil?							
-							@display.draw(previous.x, previous.y, '.', Color.new(128, 128, 128))
+							draw_on_map(previous.x, previous.y, '.', Color.new(128, 128, 128))
 						else
 							p = p.get(:display)
-							@display.draw(p.x, p.y, p.character, p.color)
+							draw_on_map(p.x, p.y, p.character, p.color)
 						end
 					end
 					
-					@display.draw(d.x, d.y, d.character, d.color)
+					draw_on_map(d.x, d.y, d.character, d.color)
 					
 					@previous_state[e] = DisplayComponent.new(d.x, d.y, d.character, d.color)					
 				end
 			end
 		end
+						
+		draw_messages
+		trim_messages
 	end	
 	
 	def draw_text(x, y, text, color)
@@ -84,5 +88,36 @@ class DisplaySystem
 	
 	def is_on_screen?(x, y)
 		return x >= 0 && x < @display.width && y >= 0 && y < @display.height			
+	end
+	
+	# Keeping absolute map coordinates, draw under the messages space
+	def draw_on_map(x, y, char, color)
+		@display.draw(x, y + 2, char, color)
+	end
+	
+	def trim_messages
+		# Max two messages
+		start_index = [1, @messages.length - 2].max
+		@messages = @messages[start_index, @messages.length] || []		
+	end
+	
+	def draw_messages
+		black = Color.new(0, 0, 0)
+		white = Color.new(255, 255, 255)
+		fill_rectangle(0, 0, @display.width, 2, ' ', black)
+		# Draw up to 2 messages
+		count = [@messages.length, 2].min
+		(0 .. count - 1).each do |i|
+			draw_text(0, i, @messages[@messages.length - count + i], white)
+		end
+	end
+	
+	def fill_rectangle(x, y, width, height, char, color)
+		Logger.info("#{x}, #{y}, #{width}, #{height}")
+		(y .. y + height - 1).each do |j|
+			(x .. x + width - 1).each do |i|				
+				@display.draw(i, j, char, color)
+			end
+		end
 	end
 end

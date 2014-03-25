@@ -11,7 +11,7 @@ class Dungeon
 	def initialize(floor)				
 		@floor = floor
 		@width = 80
-		@height = 25
+		@height = 23
 		@perimeter = true
 		@entities = []
 		
@@ -50,7 +50,7 @@ class Dungeon
 	end
 	
 	def generate_monsters
-		m = 1#rand(5) + 5
+		m = rand(5) + 5
 		(1..m).each do |i|
 			coordinates = find_empty_spot
 			@entities << Monster.new(coordinates[:x], coordinates[:y], :drone)

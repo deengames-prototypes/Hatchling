@@ -20,8 +20,10 @@ class BattleSystem
 	end
 
 	def process(input)
-		if input.has_key?(:target) && ['up', 'right', 'down', 'left'].include?(input)
+		Logger.debug("Input=#{input} #{input.has_key?(:target)}")
+		if input.has_key?(:target) && ['up', 'right', 'down', 'left'].include?(input[:key])
 			# Dear player, please ATTACK! ATTACK! ATTACK! the enemy. kthxbye.
+			#Logger.debug("Player attacks #{input[:target]}")
 		end
 		
 		@entities.each do |e|

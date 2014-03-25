@@ -20,8 +20,8 @@ class Game
 	
 	def initialize	
 		# Set the seed here for seeded games
-		seed = 289538379890027845966326158351430095932
-		Random.srand(seed)
+		#seed = 289538379890027845966326158351430095932
+		#Random.srand(seed)
 		
 		seed = srand()
 		srand(seed)
