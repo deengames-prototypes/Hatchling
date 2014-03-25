@@ -43,6 +43,7 @@ class Display
 	
 	# Color = { :r => red, :g => green, :b => blue }
 	def draw(x, y, text, color)		
+		return if text.nil? || text.length == 0
 		color_index = @color_strategy.get_index_for(color)
 		Curses.attron(Curses.color_pair(color_index) | A_NORMAL) {
 			Curses.setpos(y, x)

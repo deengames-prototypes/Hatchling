@@ -20,10 +20,10 @@ class BattleSystem
 	end
 
 	def process(input)
-		Logger.debug("Input=#{input} #{input.has_key?(:target)}")
-		if input.has_key?(:target) && ['up', 'right', 'down', 'left'].include?(input[:key])
-			# Dear player, please ATTACK! ATTACK! ATTACK! the enemy. kthxbye.
-			#Logger.debug("Player attacks #{input[:target]}")
+		messages = []
+		
+		if input.has_key?(:target) && ['up', 'right', 'down', 'left'].include?(input[:key])			
+			messages << "Player attacks #{input[:target]}!" if input[:target].has?(:health)
 		end
 		
 		@entities.each do |e|
@@ -31,10 +31,12 @@ class BattleSystem
 			if e.has?(:battle) then
 				move = e.get(:battle).pick_move				
 				if is_valid_move?(move)					
-					e.get(:display).move(move)					
+					e.get(:display).move(move)	
 				end
 			end
 		end
+		
+		return messages
 	end
 	
 	def is_valid_move?(move)		

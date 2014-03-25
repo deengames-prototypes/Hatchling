@@ -22,7 +22,9 @@ class InputSystem
 		Keys.read_character
 	end
 	
-	def get_and_process_input			
+	def get_and_process_input		
+		messages = []
+		
 		input = Keys.read_character
 		target = OpenStruct.new({ x: @player.get(:display).x, y: @player.get(:display).y })
 		if (input == 'up') then
@@ -43,11 +45,13 @@ class InputSystem
 		end
 		
 		if (!e.nil? && e.has?(:input))			
-			e.get(:input).process_input(input)
+			temp = e.get(:input).process_input(input)
+			messages << temp if !temp.nil? && temp.is_a?(String)
 		end
 		
 		result = {:key => input}
-		result[:target] = e unless e.nil?		
+		result[:target] = e unless e.nil?
+		result[:messages] = messages
 		return result
 	end
 	

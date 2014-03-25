@@ -65,8 +65,8 @@ class Game
 			audio = AudioManager.new() # Convert to audio System; pass entities
 			
 			### Draw the titlescreen ###
-			@display.draw_text(35, 10, game_data.name.upcase, Color.new(255, 0, 0))
-			@display.draw_text(30, 12, 'Press any key to begin.', Color.new(255, 255, 255))
+			@display.draw_text((80 - game_data.name.length) / 2, 10, game_data.name.upcase, Color.new(255, 0, 0))
+			@display.draw_text((80 - 23) / 2, 12, 'Press any key to begin.', Color.new(255, 255, 255))
 			@input.get_input
 			
 			### Draw the story ###
@@ -80,11 +80,17 @@ class Game
 			@display.fill_screen('.', Color.new(128, 128, 128))
 			@display.draw
 			
+			battle_messages = []
+			input = nil
 			quit = false
+			
 			while (!quit) do
+				@display.add_messages(input[:messages]) unless input.nil? || input[:messages].nil?
+				@display.add_messages(battle_messages) unless battle_messages.nil?
+								
 				@display.draw
 				input = @input.get_and_process_input
-				@battle.process(input)
+				battle_messages = @battle.process(input)
 				quit = (input[:key] == 'q' || input[:key] == 'escape')
 			end
 			Logger.info('Normal termination')
@@ -122,8 +128,7 @@ class Game
 			:display => DisplayComponent.new(map.start_x.to_i, map.start_y.to_i, '@', Color.new(255, 192, 32))
 		})		
 		
-		if map.respond_to?('stairs') && !map.stairs.nil? then
-			Logger.debug("Stairs are #{map.stairs}")
+		if map.respond_to?('stairs') && !map.stairs.nil? then			
 			if map.stairs.class.name != 'Array'			
 				# single object
 				map.stairs = [map.stairs]

@@ -4,13 +4,15 @@ require_relative '../utils/logger'
 ### The display system for your game. This code is game specific.
 class DisplaySystem	
 	
+	attr_reader :messages
+	
 	def init(entities)
 		# Draw only things that moved; draw a '.' on their old position,
 		# and draw them at their new position.
 		@previous_state = {}
 		@entities = entities
 		@display = Display.new if @display.nil?
-		@messages = ['hi', 'ho', 'silver!', 'AWAY!']
+		@messages = []
 	end	
 	
 	def destroy
@@ -84,6 +86,13 @@ class DisplaySystem
 		return nil
 	end
 	
+	def add_messages(messages)		
+		messages = messages.compact		
+		messages.each do |m|
+			@messages << m
+		end
+	end
+	
 	private
 	
 	def is_on_screen?(x, y)
@@ -97,23 +106,23 @@ class DisplaySystem
 	
 	def trim_messages
 		# Max two messages
+		@messages = @messages.compact
 		start_index = [1, @messages.length - 2].max
-		@messages = @messages[start_index, @messages.length] || []		
+		@messages = @messages[start_index, @messages.length]
+		@messages = [] if @messages.nil?
 	end
 	
 	def draw_messages
 		black = Color.new(0, 0, 0)
 		white = Color.new(255, 255, 255)
 		fill_rectangle(0, 0, @display.width, 2, ' ', black)
-		# Draw up to 2 messages
-		count = [@messages.length, 2].min
-		(0 .. count - 1).each do |i|
-			draw_text(0, i, @messages[@messages.length - count + i], white)
+		
+		(0 .. @messages.length).each do |i|			
+			draw_text(0, i, @messages[@messages.length - i], white)
 		end
 	end
 	
-	def fill_rectangle(x, y, width, height, char, color)
-		Logger.info("#{x}, #{y}, #{width}, #{height}")
+	def fill_rectangle(x, y, width, height, char, color)		
 		(y .. y + height - 1).each do |j|
 			(x .. x + width - 1).each do |i|				
 				@display.draw(i, j, char, color)
