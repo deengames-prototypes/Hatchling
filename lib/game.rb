@@ -7,7 +7,6 @@ require_relative 'utils/color'
 require_relative 'model/entity'
 require_relative 'component/display_component'
 require_relative 'component/input_component'
-require_relative 'model/dungeon'
 
 require 'ostruct'
 require 'json'
