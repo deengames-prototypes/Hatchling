@@ -1,6 +1,6 @@
 require_relative 'base_component'
 
-class InputComponent < BaseComponent
+class Hatchling::InputComponent < BaseComponent
 	def initialize(callback)
 		@callback = callback
 	end

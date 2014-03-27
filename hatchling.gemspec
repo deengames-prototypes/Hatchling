@@ -8,4 +8,7 @@ Gem::Specification.new do |s|
 	s.email			= 'alibhai.ashiq@gmail.com'
 	s.homepage		= 'https://github.com/deengames/Hatchling'
 	s.files			= Dir["{lib}/**/*.rb", "*.rb", "*.md"]
+	
+	s.add_runtime_dependency 'json', '~> 1.5.5'
+	s.add_runtime_dependency 'json', '~> 1.8.2'
 end

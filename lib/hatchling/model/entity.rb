@@ -1,11 +1,12 @@
 require_relative '../utils/logger'
 require_relative '../component/base_component'
 
+
 # Some sort of dynamic object, like C#'s ExpandoObject, or like OpenStruct.
 # It's a class that has dynamic properties. They're specified through a hash.
 # It's insensitive to strings vs. symbols, since JSON gives us symbols.
 # If you add a "display" component, access it via entity.get(:display)
-class Entity 
+class Hatchling::Entity 
 
 	def initialize(hash)
 		symbols_only = {}
