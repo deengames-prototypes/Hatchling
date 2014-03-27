@@ -132,7 +132,7 @@ module Hatchling
 				:name => 'Player',
 				# Display properties
 				:display => DisplayComponent.new(map.start_x.to_i, map.start_y.to_i, '@', Color.new(255, 192, 32))
-			})		
+			}) if @player.nil?
 			
 			if map.respond_to?('stairs') && !map.stairs.nil? then			
 				if map.stairs.class.name != 'Array'			

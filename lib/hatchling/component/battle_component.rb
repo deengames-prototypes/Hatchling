@@ -3,18 +3,19 @@ require_relative 'base_component'
 class Hatchling::BattleComponent < BaseComponent
 	attr_reader :strength, :speed
 	
-	def initialize(strength, speed)		
+	def initialize(strength, speed, target)
 		validate(strength, :strength)
 		validate(speed, :speed)
 		@strength = strength
 		@speed = speed
+		@target = target
 	end
 	
 	# Decide my next move
 	# Return a hash with :x and :y if I want to move
 	def pick_move		
-		# Naive AI: walk towards the player if possible
-		player_pos = Game.instance.player.get(:display)	
+		# Naive AI: always take one turn, and walk towards the player if possible
+		target_xy = @target.get(:display)	
 		myself = self.entity.get(:display)
 		
 		if rand(2) == 1
@@ -26,7 +27,7 @@ class Hatchling::BattleComponent < BaseComponent
 			y = get_move_y_dir
 			x = y == 0 ? get_move_x_dir : myself.x
 		end
-		
+				
 		return {:x => x, :y => y}
 	end
 	
@@ -34,12 +35,12 @@ class Hatchling::BattleComponent < BaseComponent
 	
 	
 	def get_move_x_dir
-		player_pos = Game.instance.player.get(:display)
+		target_xy = @target.get(:display)
 		myself = self.entity.get(:display)
 		
-		if player_pos.x < myself.x
+		if target_xy.x < myself.x
 			return myself.x - 1
-		elsif player_pos.x > myself.x
+		elsif target_xy.x > myself.x
 			return myself.x + 1
 		else
 			return 0
@@ -47,12 +48,12 @@ class Hatchling::BattleComponent < BaseComponent
 	end
 	
 	def get_move_y_dir
-		player_pos = Game.instance.player.get(:display)
+		target_xy = @target.get(:display)
 		myself = self.entity.get(:display)
 		
-		if player_pos.y < myself.y
+		if target_xy.y < myself.y
 			return myself.y - 1
-		elsif player_pos.y > myself.y
+		elsif target_xy.y > myself.y
 			return myself.y + 1
 		else
 			return 0
