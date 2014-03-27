@@ -1,6 +1,6 @@
 require_relative 'base_component'
 
-class Hatchling::BattleComponent < BaseComponent
+class BattleComponent < BaseComponent
 	attr_reader :strength, :speed
 	
 	def initialize(strength, speed, target)

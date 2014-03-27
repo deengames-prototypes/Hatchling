@@ -1,6 +1,6 @@
 require_relative 'base_component'
 
-class Hatchling::DisplayComponent < BaseComponent
+class DisplayComponent < BaseComponent
 	attr_accessor :x, :y
 	attr_reader :character, :color
 	

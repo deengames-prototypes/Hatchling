@@ -190,6 +190,11 @@ module Hatchling
 			else
 				change_map(@town)
 			end
+			
+			stairs_up = @current_map.stairs.find { |s| s['direction'] == 'up' }
+			p = @player.get(:display)
+			p.x = stairs_up['x']
+			p.y = stairs_up['y']
 		end
 		
 		def change_map(new_map)
