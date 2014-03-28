@@ -1,3 +1,4 @@
+# Uses the simplecov gem to generate code coverage
 require 'simplecov'
 excludes = ['all.rb', 'coverage.rb', 'test_config.rb']
 

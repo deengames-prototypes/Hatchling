@@ -21,7 +21,7 @@ class RgbColorStrategy
 			index = @rgb_to_index.size
 			@display.initialize_color(index, color)
 			@rgb_to_index[key] = index			
-			raise "WTF index=#{index}" if (index > 100)
+			raise "You've used too many colors" if (index >= 256)
 		end		
 		return @rgb_to_index[key]
 	end
