@@ -56,14 +56,17 @@ class Display
 		}		
 	end	
 	
+	def update
+		Curses.refresh
+	end
+
+	# Used by the Linux strategy to actually set the colour in the window
+	# TODO: maybe this can be a callback instead of an explicit method?
 	def initialize_color(index, color)
 		# Map (0 .. 255) to (0 .. 1000) by multiplying by 4. Max is 1020, so round down.
 		Curses.init_color(index, [color.r * 4, 1000].min, [color.g * 4, 1000].min, [color.b * 4, 1000].min)
 	end
-	
-	def update
-		Curses.refresh
-	end
+
 	
 	def destroy
 		Logger.info('Terminating display.')
