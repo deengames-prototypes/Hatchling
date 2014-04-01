@@ -4,8 +4,9 @@ require_relative '../utils/logger'
 # Uses minimal dependencies (battle component)
 class BattleSystem
 
-	def init(entities)
+	def init(entities, args)
 		@entities = entities
+		@current_map = args[:current_map]
 		
 		# Copy/pasted from other systems.
 		# TODO: DRY please
@@ -16,7 +17,7 @@ class BattleSystem
 			end			
 		end
 		
-		raise 'Can\'t find player in entities' if @player.nil?
+		raise 'Can\'t find player in entities. You need an entity with :name => "Player"' if @player.nil?
 	end
 
 	def process(input)
@@ -41,7 +42,7 @@ class BattleSystem
 	
 	def is_valid_move?(move)		
 		is_valid = true
-		is_valid &= Game.instance.current_map.is_valid_move?(move)
+		is_valid &= @current_map.is_valid_move?(move) unless @current_map.nil?
 		player_pos = @player.get(:display)
 		is_valid &= (player_pos.x != move[:x] || player_pos.y != move[:y])
 		return is_valid

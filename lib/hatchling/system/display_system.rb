@@ -6,7 +6,7 @@ class DisplaySystem
 	
 	attr_reader :messages
 	
-	def init(entities)
+	def init(entities, args)
 		# Draw only things that moved; draw a '.' on their old position,
 		# and draw them at their new position.
 		@previous_state = {}

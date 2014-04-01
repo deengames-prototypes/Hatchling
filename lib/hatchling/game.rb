@@ -190,11 +190,15 @@ module Hatchling
 			else
 				change_map(@town)
 			end
+					
+			stairs = @current_map.stairs.find { |s| !s['direction'].nil? && s['direction'].downcase == 'up' }			
+			if stairs.nil?
+				stairs = @current_map.stairs.find { |s| !s['direction'].nil? && s['direction'].downcase == 'down' }
+			end
 			
-			stairs_up = @current_map.stairs.find { |s| s['direction'] == 'up' }
 			p = @player.get(:display)
-			p.x = stairs_up['x']
-			p.y = stairs_up['y']
+			p.x = stairs['x']
+			p.y = stairs['y']			
 		end
 		
 		def change_map(new_map)
@@ -202,8 +206,8 @@ module Hatchling
 			@entities = create_entities_for(@current_map)
 			
 			# Pass entities to our systems	
-			@systems.each do |s|
-				s.init(@entities)
+			@systems.each do |s|				
+				s.init(@entities, { :current_map => @current_map })				
 			end
 			
 			@display.fill_screen('.', Color.new(128, 128, 128))

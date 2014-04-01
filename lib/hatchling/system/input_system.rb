@@ -3,7 +3,7 @@ require_relative '../utils/logger'
 
 class InputSystem
 
-	def init(entities)		
+	def init(entities, args)		
 		@entities = entities
 		@entities.each do |e|
 			if e.has?(:name) && e.name.downcase == 'player'
@@ -12,7 +12,7 @@ class InputSystem
 			end			
 		end
 		
-		raise 'Can\'t find player in entities' if @player.nil?
+		raise 'Can\'t find player in entities. You need an entity with :name => "player"' if @player.nil?
 	end	
 	
 	def destroy
