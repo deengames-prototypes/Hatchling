@@ -49,7 +49,7 @@ class BattleComponentTest < Test::Unit::TestCase
 		
 		while (next_move[:x] == move[:x] && next_move[:y] == move[:y]) do
 			tries += 1
-			assert(tries <= 10, "Didn't get two different moves in 10 tries")
+			assert(tries <= 100, "Didn't get two different moves in #{tries} tries")
 			next_move = b.pick_move
 		end
 	end
