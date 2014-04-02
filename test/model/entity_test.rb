@@ -22,5 +22,28 @@ class ModelTest < Test::Unit::TestCase
 	def test_entity_raises_for_unknown_property
 		e = Hatchling::Entity.new({})
 		assert_raise(RuntimeError) { e.speed }
-	end	
+	end
+	
+	def test_trigger_calls_receive_event_on_call_components_except_exclusion
+		called = false
+		called_with = nil
+		called_on_receiver = false
+		
+		originator = BaseComponent.new
+		receiver = BaseComponent.new
+		
+		originator.bind("Player Dies", lambda { |data| called = true; called_with = data })
+		receiver.bind("Player Dies", lambda { |data| called_on_receiver = true })
+		
+		e = Hatchling::Entity.new({
+			:broadcast => originator,
+			:receive => receiver
+		})
+		
+		receiver.trigger("Player Dies", { :source => "Poison" })
+		
+		assert_equal(true, called)
+		assert_equal("Poison", called_with[:source])
+		assert_equal(false, called_on_receiver)
+	end
 end
