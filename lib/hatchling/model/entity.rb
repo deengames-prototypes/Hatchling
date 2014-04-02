@@ -27,7 +27,10 @@ class Hatchling::Entity
 		key = normalize_key(key)
 		return @properties[key]
 	end
-		
+	
+	# Not 100% functional. If your entity has a display component, for
+	# example, you can write e.display instead of e.get(:display).
+	# Some cases fail; needs MOAR testing.
 	def method_missing(method, *args, &block)
 		key = normalize_key(method)
 		# Setter
@@ -40,6 +43,13 @@ class Hatchling::Entity
 			raise "Can't find #{method} property on entity #{self}; key=#{key}"
 		end
 	end
+	
+	# Event-based messaging
+	def trigger(event_name, data, exclusion = nil)
+		@properties.each do |name, component|
+			component.receive_event(event_name, data) unless component == exclusion
+		end
+	end	
 	
 	private
 	

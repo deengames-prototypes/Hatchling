@@ -3,6 +3,10 @@ require_relative '../utils/logger'
 
 class InputSystem
 
+	def initialize(key_reader)
+		@key_reader = key_reader
+	end
+
 	def init(entities, args)		
 		@entities = entities
 		@entities.each do |e|
@@ -19,13 +23,13 @@ class InputSystem
 	end
 
 	def get_input
-		Keys.read_character
+		@key_reader.read_character
 	end
 	
 	def get_and_process_input		
 		messages = []
 		
-		input = Keys.read_character
+		input = @key_reader.read_character
 		target = OpenStruct.new({ x: @player.get(:display).x, y: @player.get(:display).y })
 		if (input == 'up') then
 			target.y -= 1
@@ -45,13 +49,11 @@ class InputSystem
 		end
 		
 		if (!e.nil? && e.has?(:input))			
-			temp = e.get(:input).process_input(input)
-			messages << temp if !temp.nil? && temp.is_a?(String)
+			e.get(:input).process_input(input)			
 		end
 		
 		result = {:key => input}
 		result[:target] = e unless e.nil?
-		result[:messages] = messages
 		return result
 	end
 	

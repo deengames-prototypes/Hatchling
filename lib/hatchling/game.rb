@@ -21,7 +21,7 @@ module Hatchling
 		def initialize			
 			@@instance = self
 			@display = DisplaySystem.new
-			@input = InputSystem.new
+			@input = InputSystem.new(Keys)
 			@battle = BattleSystem.new
 			@systems = [@display, @input, @battle]
 		end
@@ -90,8 +90,7 @@ module Hatchling
 				input = nil
 				quit = false
 				
-				while (!quit) do
-					@display.add_messages(input[:messages]) unless input.nil? || input[:messages].nil?
+				while (!quit) do					
 					@display.add_messages(battle_messages) unless battle_messages.nil?
 									
 					@display.draw
