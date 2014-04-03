@@ -68,7 +68,7 @@ module Hatchling
 				@current_map = @town
 				@display.clear # change_map draws dots, but we can't init the display any later
 				
-				audio = AudioManager.new() # Convert to audio System; pass entities
+				#audio = AudioManager.new() # Convert to audio System; pass entities
 				
 				### Draw the titlescreen ###
 				@display.draw_text((80 - game_data.name.length) / 2, 10, game_data.name.upcase, Color.new(255, 0, 0))
@@ -92,9 +92,9 @@ module Hatchling
 				
 				while (!quit) do					
 					@display.add_messages(battle_messages) unless battle_messages.nil?
-									
-					@display.draw
+					@display.draw					
 					input = @input.get_and_process_input
+					
 					battle_messages = @battle.process(input)
 					quit = (input[:key] == 'q' || input[:key] == 'escape')
 				end
@@ -126,12 +126,12 @@ module Hatchling
 				end
 			end
 			
-			@player = Entity.new({
+			@player ||= Entity.new({
 				# For identification
 				:name => 'Player',
 				# Display properties
 				:display => DisplayComponent.new(map.start_x.to_i, map.start_y.to_i, '@', Color.new(255, 192, 32))
-			}) if @player.nil?
+			})
 			
 			if map.respond_to?('stairs') && !map.stairs.nil? then			
 				if map.stairs.class.name != 'Array'			
@@ -141,16 +141,16 @@ module Hatchling
 				
 				map.stairs.each do |s|
 					if s.has_key?('direction') && s['direction'].downcase == 'up' then
-						input = InputComponent.new(Proc.new { |input| change_floor(@current_map.floor - 1) if input == '<' })
+						i = InputComponent.new(Proc.new { |input| change_floor(@current_map.floor - 1) if input == '<' })
 						c = '<'
 					else					
-						input = InputComponent.new(Proc.new { |input| change_floor(@current_map.floor + 1) if input == '>' })
+						i = InputComponent.new(Proc.new { |input| change_floor(@current_map.floor + 1) if input == '>' })
 						c = '>'
 					end
 					
 					e = Entity.new({
 						:display => DisplayComponent.new(s['x'], s['y'], c, Color.new(255, 255, 255)),
-						:input => input,
+						:input => i,
 						:solid => false
 					})				
 					
@@ -164,8 +164,7 @@ module Hatchling
 				end
 			end
 			
-			if map.respond_to?('walls') && !map.walls.nil? then				
-				white = Color.new(255, 255, 255)
+			if map.respond_to?('walls') && !map.walls.nil? then								
 				map.walls.each do |w|
 					entities << Entity.new({ :display => DisplayComponent.new(w[0], w[1], '#', grey) })
 				end

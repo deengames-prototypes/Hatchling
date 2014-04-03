@@ -27,8 +27,6 @@ class InputSystem
 	end
 	
 	def get_and_process_input		
-		messages = []
-		
 		input = @key_reader.read_character
 		target = OpenStruct.new({ x: @player.get(:display).x, y: @player.get(:display).y })
 		if (input == 'up') then

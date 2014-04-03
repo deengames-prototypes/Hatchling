@@ -15,7 +15,6 @@ class BattleComponent < BaseComponent
 	# Return a hash with :x and :y if I want to move
 	def pick_move		
 		# Naive AI: always take one turn, and walk towards the player if possible
-		target_xy = @target.get(:display)	
 		myself = self.entity.get(:display)
 		
 		if rand(2) == 1

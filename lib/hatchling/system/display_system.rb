@@ -11,7 +11,7 @@ class DisplaySystem
 		# and draw them at their new position.
 		@previous_state = {}
 		@entities = entities
-		@display = Display.new if @display.nil?
+		@display ||= Display.new
 		@messages = []
 	end	
 	
@@ -21,11 +21,6 @@ class DisplaySystem
 
 	def draw
 		@entities.each do |e|			
-			if e.respond_to?(:name) && e.name.downcase == 'player' then
-				player = e
-				next
-			end
-			
 			if e.has?(:display)
 				d = e.get(:display)
 				draw = false
@@ -80,7 +75,7 @@ class DisplaySystem
 	# Copied from input_system.rb. TODO: DRY
 	def entity_at(x, y)		
 		@entities.each do |e|
-			return e if e.has?(:display) && e.get(:display).x == x && e.get(:display).y == y && e != @player
+			return e if e.has?(:display) && e.get(:display).x == x && e.get(:display).y == y && (!defined?(@player) || e != @player)
 		end		
 		
 		return nil
