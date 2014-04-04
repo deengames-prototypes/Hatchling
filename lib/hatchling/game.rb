@@ -73,7 +73,7 @@ module Hatchling
 				### Draw the titlescreen ###
 				@display.draw_text((80 - game_data.name.length) / 2, 10, game_data.name.upcase, Color.new(255, 0, 0))
 				@display.draw_text((80 - 23) / 2, 12, 'Press any key to begin.', Color.new(255, 255, 255))
-				@input.get_input
+				@input.get_input				
 				
 				### Draw the story ###
 				if (!game_data.story.nil?) then
@@ -113,14 +113,14 @@ module Hatchling
 			grey = Color.new(192, 192, 192)
 			
 			if map.respond_to?('perimeter') && map.perimeter == true
-				(0 .. map.width).each do |x|
+				(0 .. map.width - 1).each do |x|
 					# TODO: we have some common entities (eg. walls) and components (eg. display), irrespective of game content
 					# TODO: move this into a standard place for construction
 					entities << Entity.new({ :display => DisplayComponent.new(x, 0, '#', grey) })
 					entities << Entity.new({ :display => DisplayComponent.new(x, map.height - 1, '#', grey) })
 				end
 							
-				(0 .. map.height).each do |y|
+				(0 .. map.height - 1).each do |y|
 					entities << Entity.new({ :display => DisplayComponent.new(0, y, '#', grey) })
 					entities << Entity.new({ :display => DisplayComponent.new(map.width - 1, y, '#', grey) })
 				end

@@ -5,7 +5,7 @@ require_relative '../utils/logger'
 class DisplaySystem	
 	
 	attr_reader :messages
-	
+		
 	def init(entities, args)
 		# Draw only things that moved; draw a '.' on their old position,
 		# and draw them at their new position.
@@ -13,6 +13,10 @@ class DisplaySystem
 		@entities = entities
 		@display ||= Display.new
 		@messages = []
+		
+		# The full-size screen is 80x24, but we only draw 80x22, because
+		# we leave 2 spaces for characters; hence, this magic constant.		
+		@EXTRA_SPACE = 2
 	end	
 	
 	def destroy
@@ -65,8 +69,8 @@ class DisplaySystem
 	end
 	
 	def fill_screen(character, color)
-		(0 .. @display.width).each do |x|
-			(0 .. @display.height).each do |y|
+		(0 .. @display.width - 1).each do |x|
+			(0 .. @display.height - 1).each do |y|
 				@display.draw(x, y, character, color)
 			end
 		end
@@ -96,13 +100,13 @@ class DisplaySystem
 	
 	# Keeping absolute map coordinates, draw under the messages space
 	def draw_on_map(x, y, char, color)
-		@display.draw(x, y + 2, char, color)
+		@display.draw(x, y + @EXTRA_SPACE, char, color)
 	end
 	
 	def trim_messages
 		# Max two messages
 		@messages = @messages.compact
-		start_index = [1, @messages.length - 2].max
+		start_index = [1, @messages.length - @EXTRA_SPACE].max
 		@messages = @messages[start_index, @messages.length]
 		@messages = [] if @messages.nil?
 	end
@@ -110,7 +114,7 @@ class DisplaySystem
 	def draw_messages
 		black = Color.new(0, 0, 0)
 		white = Color.new(255, 255, 255)
-		fill_rectangle(0, 0, @display.width, 2, ' ', black)
+		fill_rectangle(0, 0, @display.width, @EXTRA_SPACE, ' ', black)
 		
 		(0 .. @messages.length).each do |i|			
 			draw_text(0, i, @messages[@messages.length - i], white)

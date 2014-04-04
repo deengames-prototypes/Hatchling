@@ -23,7 +23,7 @@ class InputSystem
 	end
 
 	def get_input
-		@key_reader.read_character
+		i = @key_reader.read_character while i.nil?
 	end
 	
 	def get_and_process_input		
