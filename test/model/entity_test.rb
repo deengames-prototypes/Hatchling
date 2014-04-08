@@ -24,26 +24,22 @@ class ModelTest < Test::Unit::TestCase
 		assert_raise(RuntimeError) { e.speed }
 	end
 	
-	def test_trigger_calls_receive_event_on_call_components_except_exclusion
-		called = false
-		called_with = nil
-		called_on_receiver = false
-		
-		originator = BaseComponent.new
+	def test_trigger_calls_receive_event_on_all_components		
+		called_with = nil						
 		receiver = BaseComponent.new
 		
-		originator.bind("Player Dies", lambda { |data| called = true; called_with = data })
-		receiver.bind("Player Dies", lambda { |data| called_on_receiver = true })
+		receiver.bind("Player Dies", lambda { |data| 			
+			called_with = data
+		})
 		
-		e = Hatchling::Entity.new({
-			:broadcast => originator,
+		e = Hatchling::Entity.new({			
 			:receive => receiver
 		})
 		
-		receiver.trigger("Player Dies", { :source => "Poison" })
+		e.trigger("Player Dies", { :source => "Poison" })
 		
-		assert_equal(true, called)
+		assert_not_nil(called_with, 'Event was never triggered on receiver')
 		assert_equal("Poison", called_with[:source])
-		assert_equal(false, called_on_receiver)
+		
 	end
 end
