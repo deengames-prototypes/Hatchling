@@ -13,10 +13,6 @@ class BaseComponent
 	
 	# Event-based messaging
 	
-	def trigger(event_name, data)
-		@entity.trigger(event_name, data, self)
-	end
-	
 	def receive_event(event_name, data)
 		@event_handlers[event_name].call(data)
 	end

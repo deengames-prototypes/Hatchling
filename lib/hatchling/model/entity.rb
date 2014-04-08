@@ -45,9 +45,12 @@ class Hatchling::Entity
 	end
 	
 	# Event-based messaging
-	def trigger(event_name, data, exclusion = nil)
+	
+	# Trigger an event for all of its components
+	# Called by Event.trigger for all components
+	def trigger(event_name, data)
 		@properties.each do |name, component|
-			component.receive_event(event_name, data) unless component == exclusion
+			component.receive_event(event_name, data)
 		end
 	end	
 	
