@@ -68,18 +68,17 @@ module Hatchling
 				@current_map = @town
 				@display.clear # change_map draws dots, but we can't init the display any later
 				
-				#audio = AudioManager.new() # Convert to audio System; pass entities
-				
 				### Draw the titlescreen ###
 				@display.draw_text((80 - game_data.name.length) / 2, 10, game_data.name.upcase, Color.new(255, 0, 0))
-				@display.draw_text((80 - 23) / 2, 12, 'Press any key to begin.', Color.new(255, 255, 255))
-				@input.get_input				
+				@display.draw_text((80 - 23) / 2, 12, 'Press any key to begin.', Color.new(255, 255, 255))				
+				AudioManager.new.play(game_data.titlescreen_audio) if !game_data.titlescreen_audio.nil?				
+				@input.get_input	
 				
 				### Draw the story ###
 				if (!game_data.story.nil?) then
 					@display.clear				
 					@display.draw_text(0, 0, game_data.story, Color.new(192, 192, 192))
-					@input.get_input				
+					@input.get_input			
 				end
 				
 				# Start drawing the main map
