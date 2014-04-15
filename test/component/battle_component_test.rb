@@ -6,20 +6,20 @@ require_relative "#{SOURCE_ROOT}/model/entity"
 class BattleComponentTest < Test::Unit::TestCase
 	
 	def test_initialize_sets_strength_and_speed
-		b = BattleComponent.new(17, 241, nil)
+		b = BattleComponent.new({:strength => 17, :speed => 241 })
 		assert_equal(17, b.strength)
 		assert_equal(241, b.speed)
 	end
 	
 	def test_initialize_raises_if_values_are_non_positive_integers
-		assert_raise(RuntimeError) { BattleComponent.new(0, "hi", nil) }
-		assert_raise(RuntimeError) { BattleComponent.new(13, -1, nil) }		
+		assert_raise(RuntimeError) { BattleComponent.new( {:strength => 0, :speed => "hi"} ) }
+		assert_raise(RuntimeError) { BattleComponent.new( {:strength => 13, :speed => -1} ) }		
 	end
 	
 	def test_pick_move_moves_closer_to_target_on_random_axis
 		target = Hatchling::Entity.new({:display => DisplayComponent.new(3, 3, '@', "redz")})
 		
-		b = BattleComponent.new(1, 1, target);
+		b = BattleComponent.new({:strength => 1, :speed => 1, :target => target});
 		d = DisplayComponent.new(5, 5, '@', "bluez");
 		
 		me = Hatchling::Entity.new({

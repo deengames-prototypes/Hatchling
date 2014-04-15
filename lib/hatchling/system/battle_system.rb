@@ -22,9 +22,10 @@ class BattleSystem
 
 	def process(input)
 		messages = []
+		attacks = []
 		
 		if input.has_key?(:target) && ['up', 'right', 'down', 'left'].include?(input[:key])			
-			messages << "Player attacks #{input[:target]}!" if input[:target].has?(:health)
+			attacks << {:attacker => @player, :target => input[:target]} if input[:target].has?(:health)
 		end
 		
 		@entities.each do |e|
@@ -37,7 +38,7 @@ class BattleSystem
 			end
 		end
 		
-		return messages
+		return {:messages => messages, :attacks => attacks}
 	end
 	
 	def is_valid_move?(move)		

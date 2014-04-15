@@ -95,3 +95,9 @@ EventSystem.trigger('Calculated PI', 3.14159)
 In this example, we use a `BaseComponent` instance (for illustrative means only). In practice, you'll use other components (including your own custom ones).
 
 This event will be broadcast to all components in the game.
+
+## Battle
+- Create a `Battler` class
+- Make a `resolve_attacks(attacks)` method
+    - Takes an array of {:attacker => ..., :target => ...} (entities)
+    - Returns {:messages => [m1, m2, ...]}

@@ -60,6 +60,7 @@ module Hatchling
 				
 				# Load entitiy/component definitions			
 				@component_definitions = game_data.components
+				battler = Battler.new # Game-specific class instance
 				
 				# Load the starting map.
 				@town = OpenStruct.new(JSON.parse(File.read("data/maps/#{game_data.starting_map}")))
@@ -72,7 +73,7 @@ module Hatchling
 				@display.draw_text((80 - game_data.name.length) / 2, 10, game_data.name.upcase, Color.new(255, 0, 0))
 				@display.draw_text((80 - 23) / 2, 12, 'Press any key to begin.', Color.new(255, 255, 255))				
 				AudioManager.new.play(game_data.titlescreen_audio) if !game_data.titlescreen_audio.nil?				
-				@input.get_input	
+				@input.get_input				
 				
 				### Draw the story ###
 				if (!game_data.story.nil?) then
@@ -94,9 +95,17 @@ module Hatchling
 					@display.draw					
 					input = @input.get_and_process_input
 					
-					battle_messages = @battle.process(input)
+					battle_results = @battle.process(input)
+					battle_messages = battle_results[:messages]
+					battler_messages = battler.resolve_attacks(battle_results[:attacks])[:messages]
+					
+					battler_messages.each do |m|
+						battle_messages << m
+					end
+					
 					quit = (input[:key] == 'q' || input[:key] == 'escape')
 				end
+				
 				Logger.info('Normal termination')
 			rescue StandardError => e
 				Logger.info("Termination by error: #{e}\n#{e.backtrace}") unless !setup_logger

@@ -15,7 +15,7 @@ class BattleSystemTest < Test::Unit::TestCase
 	
 	def test_init_raises_if_player_is_not_found
 		e = Hatchling::Entity.new({
-			:battle => BattleComponent.new(1, 2, nil),
+			:battle => BattleComponent.new({:strength => 1, :speed => 2}),
 			:display => DisplayComponent.new(0, 0, '@', nil)
 		})
 		

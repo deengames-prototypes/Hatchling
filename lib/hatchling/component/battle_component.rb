@@ -3,12 +3,19 @@ require_relative 'base_component'
 class BattleComponent < BaseComponent
 	attr_reader :strength, :speed
 	
-	def initialize(strength, speed, target)
-		validate(strength, :strength)
-		validate(speed, :speed)
-		@strength = strength
-		@speed = speed
-		@target = target
+	def initialize(props)
+		validate(props[:strength], :strength)		
+		validate(props[:speed], :speed)
+				
+		@strength = props[:strength]
+		@speed = props[:speed]
+		
+		if props.has_key?(:defense) then
+			validate(props[:defense], :defense)
+			@defense = props[:defense]
+		end
+		
+		@target = props[:target] if props.has_key?(:target)
 	end
 	
 	# Decide my next move
