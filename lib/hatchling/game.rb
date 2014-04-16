@@ -97,10 +97,14 @@ module Hatchling
 					
 					battle_results = @battle.process(input)
 					battle_messages = battle_results[:messages]
-					battler_messages = battler.resolve_attacks(battle_results[:attacks])[:messages]
+					battler_results = battler.resolve_attacks(battle_results[:attacks])
 					
-					battler_messages.each do |m|
+					battler_results[:messages].each do |m|
 						battle_messages << m
+					end
+					
+					@entities.each do |e|
+						@entities.delete(e) if e.has?(:health) && !e.get(:health).is_alive?
 					end
 					
 					quit = (input[:key] == 'q' || input[:key] == 'escape')
@@ -212,6 +216,11 @@ module Hatchling
 			@current_map = new_map
 			@entities = create_entities_for(@current_map)
 			
+			# Synch entities of the generated map (Hatchling: from JSON) and Dungeon map (from the game)
+			# This simplifies all kinds of things, like collision detection.
+			@entities.concat(new_map.entities) if !new_map.entities.nil?
+			@current_map.entities = @entities
+			
 			# Pass entities to our systems	
 			@systems.each do |s|				
 				s.init(@entities, { :current_map => @current_map })				
@@ -224,8 +233,9 @@ module Hatchling
 		
 		def note_seed
 			# Set the seed here for seeded games
-			#seed = 289538379890027845966326158351430095932
-			#Random.srand(seed)			
+			#seed = 225931023275159639213945590160008751535
+			#Random.srand(seed)
+			
 			seed = srand()
 			srand(seed)
 			Logger.info("This is game ##{seed}")

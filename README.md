@@ -100,4 +100,4 @@ This event will be broadcast to all components in the game.
 - Create a `Battler` class
 - Make a `resolve_attacks(attacks)` method
     - Takes an array of {:attacker => ..., :target => ...} (entities)
-    - Returns {:messages => [m1, m2, ...]}
+    - Returns `{:messages => [m1, m2, ...]}` (an array of messages for the UI)

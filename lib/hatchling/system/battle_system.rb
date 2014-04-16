@@ -44,8 +44,10 @@ class BattleSystem
 	def is_valid_move?(move)		
 		is_valid = true
 		is_valid &= @current_map.is_valid_move?(move) unless @current_map.nil?
+		
 		player_pos = @player.get(:display)
 		is_valid &= (player_pos.x != move[:x] || player_pos.y != move[:y])
+		
 		return is_valid
 	end
 end

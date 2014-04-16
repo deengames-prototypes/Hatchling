@@ -8,8 +8,8 @@ class DisplaySystem
 		
 	def init(entities, args)
 		# Draw only things that moved; draw a '.' on their old position,
-		# and draw them at their new position.
-		@previous_state = {}
+		# and draw them at their new position.		
+		@previous_state = {} # entity => old position display component
 		@entities = entities
 		@display ||= Display.new
 		@messages = []
@@ -24,6 +24,18 @@ class DisplaySystem
 	end
 
 	def draw
+		floor_color = Color.new(128, 128, 128)
+		
+		# Draw all squares where entities are removed
+		@previous_state.each do |e, display|
+			if !@entities.include?(e)
+				pos = e.get(:display)				
+				draw_on_map(pos.x, pos.y, '.', floor_color) 
+				@previous_state.delete(e)
+			end
+		end
+		
+		# Draw all entities that moved
 		@entities.each do |e|			
 			if e.has?(:display)
 				d = e.get(:display)
@@ -31,7 +43,7 @@ class DisplaySystem
 				previous = nil
 				
 				# Didn't draw you before?
-				draw = true if !@previous_state.has_key?(e)
+				draw = true if !@previous_state.has_key?(e)				
 				# Did you move?
 				if @previous_state.has_key?(e)
 					previous = @previous_state[e]
@@ -42,7 +54,7 @@ class DisplaySystem
 					if !previous.nil?					
 						p = self.entity_at(previous.x, previous.y)
 						if p.nil?							
-							draw_on_map(previous.x, previous.y, '.', Color.new(128, 128, 128))
+							draw_on_map(previous.x, previous.y, '.', floor_color)
 						else
 							p = p.get(:display)
 							draw_on_map(p.x, p.y, p.character, p.color)
@@ -54,7 +66,7 @@ class DisplaySystem
 					@previous_state[e] = DisplayComponent.new(d.x, d.y, d.character, d.color)					
 				end
 			end
-		end
+		end		
 						
 		draw_messages
 		trim_messages
