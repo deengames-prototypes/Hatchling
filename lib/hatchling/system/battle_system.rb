@@ -32,7 +32,9 @@ class BattleSystem
 			next if @player == e
 			if e.has?(:battle) then
 				move = e.get(:battle).pick_move				
-				if is_valid_move?(move)					
+				if player_at?(move) then					
+					attacks << {:attacker => e, :target => @player}
+				elsif is_valid_move?(move) then					
 					e.get(:display).move(move)	
 				end
 			end
@@ -43,11 +45,13 @@ class BattleSystem
 	
 	def is_valid_move?(move)		
 		is_valid = true
-		is_valid &= @current_map.is_valid_move?(move) unless @current_map.nil?
-		
-		player_pos = @player.get(:display)
-		is_valid &= (player_pos.x != move[:x] || player_pos.y != move[:y])
-		
+		is_valid &= @current_map.is_valid_move?(move) unless @current_map.nil?		
+		is_valid &= !player_at?(move)		
 		return is_valid
+	end
+	
+	def player_at?(move)
+		player_pos = @player.get(:display)
+		return (player_pos.x == move[:x] && player_pos.y == move[:y])
 	end
 end

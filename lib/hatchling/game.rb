@@ -143,6 +143,7 @@ module Hatchling
 				:name => 'Player',
 				# Display properties
 				:display => DisplayComponent.new(map.start_x.to_i, map.start_y.to_i, '@', Color.new(255, 192, 32)),
+				:health => HealthComponent.new(50),
 				:battle => BattleComponent.new({:strength => 7, :speed => 3 })
 			})
 			

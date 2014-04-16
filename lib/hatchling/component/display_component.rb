@@ -15,4 +15,8 @@ class DisplayComponent < BaseComponent
 		@x = move[:x] if move.has_key?(:x)
 		@y = move[:y] if move.has_key?(:y)
 	end
+	
+	def to_s
+		return "#{@character} at (#{x}, #{y})"
+	end
 end
