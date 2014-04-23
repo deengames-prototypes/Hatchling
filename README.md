@@ -101,3 +101,32 @@ This event will be broadcast to all components in the game.
 - Make a `resolve_attacks(attacks)` method
     - Takes an array of {:attacker => ..., :target => ...} (entities)
     - Returns `{:messages => [m1, m2, ...]}` (an array of messages for the UI)
+
+You make your own batler, with your own rules. If you want to use a default (generic) battler, here's one that uses only core components (`BattleComponent`, `HealthComponent`) for simple damage calculation (`attack - defense`):
+
+```
+require 'hatchling'
+require_relative 'monster'
+
+include Hatchling
+
+class Battler
+	def resolve_attacks(attacks)
+		messages = []		
+		
+		attacks.each do |a|
+			attacker = a[:attacker]
+			target = a[:target]
+						
+			damage = attacker.get(:battle).strength
+			health = target.get(:health)			
+			health.get_hurt(damage) if damage > 0
+									
+			message = "#{attacker.name} attacks #{target.name} for #{damage} damage!"
+			message += " #{target.name} dies!" if !health.is_alive?
+			messages << message
+		end
+		return {:messages => messages}
+	end
+end
+```
