@@ -24,20 +24,20 @@ class BattleSystem
 		messages = []
 		attacks = []
 		
+		# Player always goes first
 		if input.has_key?(:target) && ['up', 'right', 'down', 'left'].include?(input[:key])			
 			attacks << {:attacker => @player, :target => input[:target]} if input[:target].has?(:health)
 		end
 		
-		movers = @entities.select { |e| e != @player && e.has?(:battle) }.sort_by { |e| e.get(:battle).speed }.reverse
-		movers.each do |e|			
-			if e.has?(:battle) then
-				move = e.get(:battle).pick_move				
-				if player_at?(move) then					
-					attacks << {:attacker => e, :target => @player}
-				elsif is_valid_move?(move) then					
-					e.get(:display).move(move)	
-				end
-			end
+		# Get all entities, who are not the player, who move, and are alive. Process their turns in order of speed (highest first).
+		movers = @entities.select { |e| e != @player && e.has?(:battle) && e.has?(:health) && e.get(:health).is_alive? }.sort_by { |e| e.get(:battle).speed }.reverse
+		movers.each do |e|						
+			move = e.get(:battle).pick_move				
+			if player_at?(move) then					
+				attacks << {:attacker => e, :target => @player}				
+			elsif is_valid_move?(move) then					
+				e.get(:display).move(move)	
+			end			
 		end
 		
 		return {:messages => messages, :attacks => attacks}

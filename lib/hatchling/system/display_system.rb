@@ -123,9 +123,10 @@ class DisplaySystem
 		# Max two messages		
 		@text = ""
 		max_length = @EXTRA_SPACE * @display.width
+		# reverse so we get the first message first
+		@messages = @messages.reverse
 		
-		while (@text.length < max_length && @messages.length > 0) do
-			# use of "pop" means, oldest message first, because of message ordering.
+		while (@text.length < max_length && @messages.length > 0) do			
 			next_message = @messages.pop
 			@text = "#{@text}#{next_message} "
 		end
