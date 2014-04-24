@@ -66,10 +66,10 @@ class DisplaySystem
 					@previous_state[e] = DisplayComponent.new(d.x, d.y, d.character, d.color)					
 				end
 			end
-		end		
-						
-		draw_messages
+		end
+		
 		trim_messages
+		draw_messages		
 	end	
 	
 	def draw_text(x, y, text, color)
@@ -116,20 +116,20 @@ class DisplaySystem
 	end
 	
 	def trim_messages
-		# Max two messages
+		# Max two messages		
 		@messages = @messages.compact
 		start_index = [1, @messages.length - @EXTRA_SPACE].max
 		@messages = @messages[start_index, @messages.length]
-		@messages = [] if @messages.nil?
+		@messages = [] if @messages.nil?		
 	end
 	
 	def draw_messages
 		black = Color.new(0, 0, 0)
 		white = Color.new(255, 255, 255)
 		fill_rectangle(0, 0, @display.width, @EXTRA_SPACE, ' ', black)
-		
+				
 		(0 .. @messages.length).each do |i|			
-			draw_text(0, i, @messages[@messages.length - i], white)
+			draw_text(0, i - 1, @messages[@messages.length - i], white)
 		end
 	end
 	
