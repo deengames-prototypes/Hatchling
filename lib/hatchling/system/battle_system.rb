@@ -28,8 +28,8 @@ class BattleSystem
 			attacks << {:attacker => @player, :target => input[:target]} if input[:target].has?(:health)
 		end
 		
-		@entities.each do |e|
-			next if @player == e
+		movers = @entities.select { |e| e != @player && e.has?(:battle) }.sort_by { |e| e.get(:battle).speed }.reverse
+		movers.each do |e|			
 			if e.has?(:battle) then
 				move = e.get(:battle).pick_move				
 				if player_at?(move) then					

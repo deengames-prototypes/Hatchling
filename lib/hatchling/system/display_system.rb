@@ -15,7 +15,7 @@ class DisplaySystem
 		@messages = []
 		
 		# The full-size screen is 80x24, but we only draw 80x22, because
-		# we leave 2 spaces for characters; hence, this magic constant.		
+		# we leave 2 spaces for messages; hence, this magic constant.		
 		@EXTRA_SPACE = 2
 	end	
 	
@@ -68,7 +68,6 @@ class DisplaySystem
 			end
 		end
 		
-		trim_messages
 		draw_messages		
 	end	
 	
@@ -115,22 +114,27 @@ class DisplaySystem
 		@display.draw(x, y + @EXTRA_SPACE, char, color)
 	end
 	
-	def trim_messages
-		# Max two messages		
-		@messages = @messages.compact
-		start_index = [1, @messages.length - @EXTRA_SPACE].max
-		@messages = @messages[start_index, @messages.length]
-		@messages = [] if @messages.nil?		
-	end
-	
 	def draw_messages
 		black = Color.new(0, 0, 0)
 		white = Color.new(255, 255, 255)
 		fill_rectangle(0, 0, @display.width, @EXTRA_SPACE, ' ', black)
-				
-		(0 .. @messages.length).each do |i|			
-			draw_text(0, i - 1, @messages[@messages.length - i], white)
+		
+		# Draw as many messages as will fit. Until we're done.
+		# Max two messages		
+		@text = ""
+		max_length = @EXTRA_SPACE * @display.width
+		
+		while (@text.length < max_length && @messages.length > 0) do
+			# use of "pop" means, oldest message first, because of message ordering.
+			next_message = @messages.pop
+			@text = "#{@text}#{next_message} "
 		end
+		
+		@text = "#{@text[0, max_length - 4]} ..." if @text.length > max_length
+		
+		@messages = []
+		
+		draw_text(0, 0, @text, white)
 	end
 	
 	def fill_rectangle(x, y, width, height, char, color)		
