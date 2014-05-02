@@ -1,4 +1,5 @@
 require_relative 'base_component'
+require_relative '../system/event_system'
 
 class ExperienceComponent < BaseComponent
 	attr_reader :experience, :level	
@@ -7,6 +8,7 @@ class ExperienceComponent < BaseComponent
 		@exp_for_level = exp_for_level_lambda
 		@experience = 0
 		@level = 1
+		super()
 	end
 	
 	def next_level_at
@@ -24,6 +26,6 @@ class ExperienceComponent < BaseComponent
 			@level += 1
 		end
 		
-		#Hatchling::EventSystem.trigger('Levelled up', { :Level => @level, :levels_up  => @level - old_level })
+		EventSystem.trigger(:leveled_up, { :level => @level, :levels_up  => @level - old_level })
 	end
 end

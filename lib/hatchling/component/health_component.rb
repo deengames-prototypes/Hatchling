@@ -7,6 +7,7 @@ class HealthComponent < BaseComponent
 		validate(max_health)
 		@current_health = max_health
 		@max_health = max_health
+		super()
 	end
 	
 	def get_hurt(amount)

@@ -9,6 +9,7 @@ class DisplayComponent < BaseComponent
 		@y = y
 		@character = char
 		@color = color
+		super()
 	end
 	
 	def move(move)

@@ -14,6 +14,7 @@ class BaseComponent
 	# Event-based messaging
 	
 	def receive_event(event_name, data)
-		@event_handlers[event_name].call(data)
+		# Call event handlers (if there are any)
+		@event_handlers[event_name].call(data) unless @event_handlers[event_name].nil?
 	end
 end

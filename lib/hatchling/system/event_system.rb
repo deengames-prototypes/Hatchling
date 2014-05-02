@@ -13,7 +13,7 @@ class EventSystem
 		@entities = entities		
 	end
 
-	def trigger(event_name, data)
+	def trigger(event_name, data)		
 		@entities.each do |e|
 			e.trigger(event_name, data)
 		end
