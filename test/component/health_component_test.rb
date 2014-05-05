@@ -46,4 +46,20 @@ class HealthComponentTest < Test::Unit::TestCase
 		h.get_hurt(1)
 		assert_equal(false, h.is_alive?)
 	end
+	
+	def test_get_hurt_triggers_died_event_on_death
+		data_seen = nil
+				
+		h = HealthComponent.new(20)
+		
+		dummy = Hatchling::Entity.new({:health => h })
+		h.bind(:died, lambda { |data|
+			data_seen = data			
+		})
+		system = EventSystem.new
+		system.init([dummy], nil)
+		
+		h.get_hurt(200)		
+		assert_equal(dummy, data_seen[:entity])		
+	end
 end

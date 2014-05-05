@@ -18,7 +18,7 @@ class ExperienceComponentTest < Test::Unit::TestCase
 		assert_equal(300, e.next_level_at)
 	end
 	
-	def test_gaining_levels_fires_event
+	def test_gaining_levels_triggers_event
 		data_seen = nil
 				
 		e = ExperienceComponent.new(lambda { |x| return 100*x })		

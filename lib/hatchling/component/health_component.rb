@@ -1,4 +1,5 @@
 require_relative 'base_component'
+require_relative '../system/event_system'
 
 class HealthComponent < BaseComponent
 	attr_reader :current_health, :max_health
@@ -13,6 +14,7 @@ class HealthComponent < BaseComponent
 	def get_hurt(amount)
 		validate(amount)
 		@current_health = [@current_health - amount, 0].max
+		EventSystem.trigger(:died, { :entity => @entity })
 	end
 	
 	def is_alive?
