@@ -20,6 +20,6 @@ class EventSystem
 	end
 	
 	def self.trigger(event_name, data)
-		@@instance.trigger(event_name, data)
+		@@instance.trigger(event_name, data) unless @@instance.nil?
 	end
 end

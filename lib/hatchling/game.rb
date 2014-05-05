@@ -201,7 +201,7 @@ module Hatchling
 		
 		def change_floor(floor_num)
 			if floor_num > 0
-				change_map(Dungeon.new(floor_num))
+				change_map(Dungeon.new(floor_num, @player))
 			else
 				change_map(@town)
 			end
