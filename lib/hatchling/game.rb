@@ -22,7 +22,7 @@ module Hatchling
 		def initialize			
 			@@instance = self
 			@display = DisplaySystem.new
-			@input = InputSystem.new(Keys)
+			@input = InputSystem.new(Keys, @display)
 			@battle = BattleSystem.new
 			@systems = [@display, @input, @battle]
 		end
@@ -96,16 +96,18 @@ module Hatchling
 					@display.draw					
 					input = @input.get_and_process_input
 					
-					battle_results = @battle.process(input)
-					battle_messages = battle_results[:messages]
-					battler_results = battler.resolve_attacks(battle_results[:attacks])
-					
-					battler_results[:messages].each do |m|
-						battle_messages << m
-					end
-					
-					@entities.each do |e|
-						@entities.delete(e) if e.has?(:health) && !e.get(:health).is_alive?
+					if input[:pass_time] == true then
+						battle_results = @battle.process(input)
+						battle_messages = battle_results[:messages]
+						battler_results = battler.resolve_attacks(battle_results[:attacks])
+						
+						battler_results[:messages].each do |m|
+							battle_messages << m
+						end
+						
+						@entities.each do |e|
+							@entities.delete(e) if e.has?(:health) && !e.get(:health).is_alive?
+						end
 					end
 					
 					quit = (input[:key] == 'q' || input[:key] == 'escape')

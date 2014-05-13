@@ -1,13 +1,19 @@
 require 'ostruct'
 require_relative '../utils/logger'
+require_relative '../ui/character_screen'
 
 class InputSystem
 
-	def initialize(key_reader)
+	def initialize(key_reader, display_system)
 		@key_reader = key_reader
+		@display_system = display_system
+		setup_default_key_mappings
 	end
 
-	def init(entities, args)		
+	# TODO: accept a mapping of keys and functions to call when they're pressed
+	# eg. pressing "c" calls "show_character_sheet," but we do that already.
+	# Consider also exposing the mappings so that Hatchling users can tweak them.
+	def init(entities, args)
 		@entities = entities
 		@entities.each do |e|
 			if e.has?(:name) && e.name.downcase == 'player'
@@ -38,8 +44,14 @@ class InputSystem
 		# Also does stuff like trapping ">" and sending it to stairs
 		target = process_move(input)		
 		
+		@mappings.each do |key, function|
+			function.call if input == key
+		end
+		
 		result = {:key => input}
 		result[:target] = target unless target.nil?
+		# Time passes if you moved
+		result[:pass_time] = moves.include?(input)
 		return result
 	end
 	
@@ -82,5 +94,11 @@ class InputSystem
 		end
 		
 		return e
+	end
+	
+	def setup_default_key_mappings
+		@mappings = {
+			'c' => lambda { CharacterScreen.new(@display_system, self).show }
+		}		
 	end
 end

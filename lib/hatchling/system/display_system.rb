@@ -1,7 +1,8 @@
 require_relative '../io/display'
 require_relative '../utils/logger'
 
-### The display system for your game. This code is game specific.
+# Currently, tangled with two responsibilities: drawing only entities
+# that moved, and exposing some platform-generic wrappers to draw stuff.
 class DisplaySystem	
 	
 	attr_reader :messages
@@ -26,7 +27,7 @@ class DisplaySystem
 	def draw
 		floor_color = Color.new(128, 128, 128)
 		
-		# Draw all squares where entities are removed
+		# Draw all squares where entities are removed		
 		@previous_state.each do |e, display|
 			if !@entities.include?(e)
 				pos = e.get(:display)				
@@ -35,9 +36,9 @@ class DisplaySystem
 			end
 		end
 		
-		# Draw all entities that moved
+		# Draw all entities that moved		
 		@entities.each do |e|			
-			if e.has?(:display)
+			if e.has?(:display)				
 				d = e.get(:display)
 				draw = false
 				previous = nil
@@ -67,7 +68,7 @@ class DisplaySystem
 				end
 			end
 		end
-		
+				
 		draw_messages		
 	end	
 	
@@ -77,6 +78,7 @@ class DisplaySystem
 	
 	def clear
 		self.fill_screen(' ', Color.new(0, 0, 0))
+		@previous_state.clear # force redrawing everything
 	end
 	
 	def fill_screen(character, color)
@@ -85,6 +87,7 @@ class DisplaySystem
 				@display.draw(x, y, character, color)
 			end
 		end
+		@previous_state.clear # force redrawing everything
 	end
 	
 	# Copied from input_system.rb. TODO: DRY
