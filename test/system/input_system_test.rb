@@ -19,11 +19,11 @@ class InputSystemTest < Test::Unit::TestCase
 			:display => DisplayComponent.new(0, 0, '@', nil)
 		})
 		
-		assert_raise(RuntimeError) { InputSystem.new(nil).init([], nil) }
-		assert_raise(RuntimeError) { InputSystem.new(nil).init([e], nil) }
+		assert_raise(RuntimeError) { InputSystem.new(nil, nil).init([], nil) }
+		assert_raise(RuntimeError) { InputSystem.new(nil, nil).init([e], nil) }
 		
 		player = Hatchling::Entity.new({ :name => 'player'})		
-		assert_nothing_raised { InputSystem.new(nil).init([e, player], nil) }
+		assert_nothing_raised { InputSystem.new(nil, nil).init([e, player], nil) }
 	end
 	
 	def test_get_and_process_input_returns_target_if_one_exists_and_calls_process_input
@@ -34,7 +34,7 @@ class InputSystemTest < Test::Unit::TestCase
 			:input => InputComponent.new(lambda { |i| status = :pass })
 		})
 		
-		i = InputSystem.new(MockKeys)
+		i = InputSystem.new(MockKeys, nil)
 		i.init([m, @player], nil)
 		result = i.get_and_process_input
 		assert_equal(m, result[:target])
@@ -46,7 +46,7 @@ class InputSystemTest < Test::Unit::TestCase
 			:display => DisplayComponent.new(50, 14, 'm', :red)
 		})
 		
-		i = InputSystem.new(MockKeys)
+		i = InputSystem.new(MockKeys, nil)
 		i.init([m, @player], nil)
 		result = i.get_and_process_input
 		assert_equal(nil, result[:target])
