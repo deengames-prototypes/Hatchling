@@ -98,7 +98,7 @@ class InputSystem
 	
 	def setup_default_key_mappings
 		@mappings = {
-			'c' => lambda { CharacterScreen.new(@display_system, self).show }
+			'c' => lambda { CharacterScreen.new(@display_system, self, @entities).show }
 		}		
 	end
 end
