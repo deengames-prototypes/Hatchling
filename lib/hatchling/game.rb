@@ -219,13 +219,17 @@ module Hatchling
 		end
 		
 		def change_map(new_map)
-			@current_map = new_map
-			@entities = create_entities_for(@current_map)
+			@current_map = new_map			
+			@entities = create_entities_for(@current_map)			
 			
 			# Synch entities of the generated map (Hatchling: from JSON) and Dungeon map (from the game)
 			# This simplifies all kinds of things, like collision detection.
+			# This line may be causing duplicate entries in the array
 			@entities.concat(new_map.entities) if !new_map.entities.nil?
 			@current_map.entities = @entities
+			
+			# How are we getting duplicates? This makes no sense. But it is a real bug.
+			@current_map.entities.uniq!
 			
 			# Pass entities to our systems	
 			@systems.each do |s|				
