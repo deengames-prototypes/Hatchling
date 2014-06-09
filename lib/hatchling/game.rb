@@ -19,12 +19,13 @@ module Hatchling
 		
 		@@instance = nil	
 		
-		def initialize			
+		def initialize(seed = nil)
 			@@instance = self
 			@display = DisplaySystem.new
 			@input = InputSystem.new(Keys, @display)
 			@battle = BattleSystem.new
 			@systems = [@display, @input, @battle]
+			@seed = seed
 		end
 		
 		def self.instance
@@ -242,13 +243,9 @@ module Hatchling
 		private
 		
 		def note_seed
-			# Set the seed here for seeded games
-			#seed = 225931023275159639213945590160008751535
-			#Random.srand(seed)
-			
-			seed = srand()
-			srand(seed)
-			Logger.info("This is game ##{seed}")
+			@seed ||= srand()
+			srand(@seed)
+			Logger.info("This is game ##{@seed}")
 		end
 	end
 end
