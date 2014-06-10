@@ -1,12 +1,14 @@
 require_relative '../test_config'
 require_relative "#{SOURCE_ROOT}/component/health_component"
+require_relative "#{SOURCE_ROOT}/model/entity"
 
 class HealthComponentTest < Test::Unit::TestCase
 	
-	def test_initialize_sets_current_and_max_health
+	def test_initialize_sets_current_and_max_health_and_zero_regen
 		h = HealthComponent.new(100)
 		assert_equal(100, h.current_health)
 		assert_equal(100, h.max_health)
+		assert_equal(0, h.regen_percent)
 	end
 	
 	def test_initialize_raises_if_health_is_non_positive_integers
@@ -61,5 +63,24 @@ class HealthComponentTest < Test::Unit::TestCase
 		
 		h.get_hurt(200)		
 		assert_equal(dummy, data_seen[:entity])		
+	end
+	
+	def test_regen_event_triggers_health_regeneration
+		h = HealthComponent.new(20, 1)
+		h.get_hurt(5)
+		e = EventSystem.new
+		e.init([Hatchling::Entity.new({ :health => h })], {})
+		EventSystem.trigger(:regen, nil)
+		assert_equal(1, h.regen_percent)
+		assert_equal(20, h.current_health)
+	end
+	
+	def test_regen_event_does_nothing_if_dead
+		h = HealthComponent.new(20, 1)
+		h.get_hurt(25)
+		e = EventSystem.new
+		e.init([Hatchling::Entity.new({ :health => h })], {})
+		EventSystem.trigger(:regen, nil)		
+		assert_equal(0, h.current_health)
 	end
 end
