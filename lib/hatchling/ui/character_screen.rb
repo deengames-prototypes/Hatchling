@@ -8,14 +8,16 @@ class CharacterScreen
 	end
 	
 	def show		
-		@display_system.clear
+		#@display_system.clear
 		
 		hp = @player.get(:health)
 		exp = @player.get(:experience)
 		grey = Color.new(192, 192, 192)
 		
-		@display_system.draw_text(5, 3, "Level: #{exp.level} (#{exp.experience}/#{exp.next_level_at} experience)", grey)		
-		@display_system.draw_text(5, 4, "Health: #{hp.current_health}/#{hp.max_health}", grey)
+		@display_system.draw_rectangle(3, 2, 25, 6, grey)
+		@display_system.draw_text(5, 4, "Level: #{exp.level}", grey)
+		@display_system.draw_text(5, 5, "Experience: #{exp.experience}/#{exp.next_level_at}", grey)		
+		@display_system.draw_text(5, 6, "Health: #{hp.current_health}/#{hp.max_health}", grey)
 		
 		@input_system.get_input
 		# Close the screen.		

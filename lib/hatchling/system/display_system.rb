@@ -106,6 +106,25 @@ class DisplaySystem
 		end
 	end
 	
+	def draw_rectangle(x, y, width, height, color)
+		fill_rectangle(x, y, width, height, ' ', color)
+		
+		# Draw the border
+		(x..x + width).each do |i|
+			@display.draw(i, y, '-', color)
+			@display.draw(i, y  + height, '-', color)
+		end				
+		(y..y + height).each do |j|
+			@display.draw(x, j, '|', color)
+			@display.draw(x + width, j, '|', color)
+		end
+		@display.draw(x, y, '+', color)
+		@display.draw(x + width, y, '+', color)
+		@display.draw(x, y + height, '+', color)
+		@display.draw(x + width, y + height, '+', color)
+		
+	end
+	
 	private
 	
 	def is_on_screen?(x, y)
@@ -141,7 +160,7 @@ class DisplaySystem
 		draw_text(0, 0, @text, white)
 	end
 	
-	def fill_rectangle(x, y, width, height, char, color)		
+	def fill_rectangle(x, y, width, height, char, color)
 		(y .. y + height - 1).each do |j|
 			(x .. x + width - 1).each do |i|				
 				@display.draw(i, j, char, color)
