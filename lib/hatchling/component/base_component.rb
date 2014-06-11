@@ -1,4 +1,5 @@
 # Base class for all components, with common stuff
+
 class BaseComponent
 	
 	attr_accessor :entity
@@ -14,7 +15,7 @@ class BaseComponent
 	# Event-based messaging
 	
 	def receive_event(event_name, data)
-		# Call event handlers (if there are any)
+		# Call event handlers (if there are any)		
 		@event_handlers[event_name].call(data) unless @event_handlers[event_name].nil?
 	end
 end

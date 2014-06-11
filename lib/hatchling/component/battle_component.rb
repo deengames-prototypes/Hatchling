@@ -16,6 +16,8 @@ class BattleComponent < BaseComponent
 		end
 		
 		@target = props[:target] if props.has_key?(:target)
+		
+		super()
 	end
 	
 	# Decide my next move

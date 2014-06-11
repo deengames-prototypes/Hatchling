@@ -1,4 +1,5 @@
 require_relative '../utils/logger'
+require_relative '../system/event_system'
 
 # The basic battle system. Don't change it, extend it.
 # Uses minimal dependencies (battle component)
@@ -12,7 +13,7 @@ class BattleSystem
 		# TODO: DRY please
 		@entities.each do |e|
 			if e.has?(:name) && e.name.downcase == 'player'
-				@player = e
+				@player = e				
 				break
 			end			
 		end
@@ -23,10 +24,12 @@ class BattleSystem
 	def process(input)
 		messages = []
 		attacks = []
+		regen_health = true
 		
 		# Player always goes first
 		if input.has_key?(:target) && ['up', 'right', 'down', 'left'].include?(input[:key])			
 			attacks << {:attacker => @player, :target => input[:target]} if input[:target].has?(:health)
+			regen_health = false # no regen if you attacked
 		end
 		
 		# Get all entities, who are not the player, who move, and are alive. Process their turns in order of speed (highest first).
@@ -37,12 +40,14 @@ class BattleSystem
 			move = e.get(:battle).pick_move
 			
 			if player_at?(move) then					
-				attacks << {:attacker => e, :target => @player}				
+				attacks << {:attacker => e, :target => @player}
+				regen_health = false # no regen if you were attacked	
 			elsif is_valid_move?(move) then					
 				e.get(:display).move(move)	
 			end
 		end
 		
+		EventSystem.trigger(:regen) if @player.get(:health).is_alive? && regen_health
 		return {:messages => messages, :attacks => attacks}
 	end
 	

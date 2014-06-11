@@ -11,14 +11,14 @@ class HealthComponent < BaseComponent
 		@regen_percent = regen_percent || 0
 		
 		super()
-		
+				
 		self.bind(:regen, lambda { |data|
 			if self.is_alive?
 				healing = (@regen_percent * @max_health).to_i
 				@current_health += healing			
 				@current_health = [@current_health, @max_health].min
-			end
-		})
+			end			
+		}) unless @regen_percent.nil?		
 	end
 	
 	def get_hurt(amount)

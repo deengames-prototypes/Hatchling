@@ -50,7 +50,8 @@ class Hatchling::Entity
 	# Called by Event.trigger for all components
 	def trigger(event_name, data)
 		@properties.each do |name, component|
-			component.receive_event(event_name, data)
+			# Don't do this for flat tags, eg. :name
+			component.receive_event(event_name, data) if component.respond_to?(:receive_event)
 		end
 	end	
 	

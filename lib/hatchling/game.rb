@@ -27,7 +27,7 @@ module Hatchling
 			@systems = [@display, @input, @battle]
 			@seed = args[:seed] unless args[:seed].nil?
 			@player = args[:player]
-			validate_player
+			validate_player			
 		end
 		
 		def self.instance
@@ -230,6 +230,9 @@ module Hatchling
 			@systems.each do |s|				
 				s.init(@entities, { :current_map => @current_map })				
 			end
+			
+			# Initialize event system. It's stored statically.
+			EventSystem.new.init(@entities)
 			
 			@display.fill_screen('.', Color.new(128, 128, 128))
 		end

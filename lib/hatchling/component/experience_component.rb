@@ -23,9 +23,11 @@ class ExperienceComponent < BaseComponent
 		old_level = @level
 		
 		while (@experience >= next_level_at) do
-			@level += 1
+			@level += 1		
 		end
 		
-		EventSystem.trigger(:leveled_up, { :level => @level, :levels_up  => @level - old_level })
+		if @level > old_level
+			EventSystem.trigger(:leveled_up, { :level => @level, :levels_up  => @level - old_level })
+		end
 	end
 end

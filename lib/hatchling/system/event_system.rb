@@ -9,17 +9,17 @@ class EventSystem
 		@@instance = self
 	end
 
-	def init(entities, args)
+	def init(entities, args = {})
 		@entities = entities		
 	end
 
 	def trigger(event_name, data)		
-		@entities.each do |e|
+		@entities.each do |e|			
 			e.trigger(event_name, data)
 		end
 	end
 	
-	def self.trigger(event_name, data)
+	def self.trigger(event_name, data = nil)		
 		@@instance.trigger(event_name, data) unless @@instance.nil?
 	end
 end
