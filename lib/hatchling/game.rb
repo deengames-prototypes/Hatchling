@@ -19,13 +19,15 @@ module Hatchling
 		
 		@@instance = nil	
 		
-		def initialize(seed = nil)
+		def initialize(args = {})
 			@@instance = self
 			@display = DisplaySystem.new
 			@input = InputSystem.new(Keys, @display)
 			@battle = BattleSystem.new
 			@systems = [@display, @input, @battle]
-			@seed = seed
+			@seed = args[:seed] unless args[:seed].nil?
+			@player = args[:player]
+			validate_player
 		end
 		
 		def self.instance
@@ -142,16 +144,7 @@ module Hatchling
 				end
 			end
 			
-			@player ||= Entity.new({
-				# For identification
-				:name => 'Player',
-				# Display properties
-				:display => DisplayComponent.new(map.start_x.to_i, map.start_y.to_i, '@', Color.new(255, 192, 32)),
-				:health => HealthComponent.new(50),
-				:battle => BattleComponent.new({:strength => 7, :speed => 3 }),
-				# TODO: make this lambda available to the user to specify. Simple exponential growth: 50x^2 + 100x
-				:experience => ExperienceComponent.new(lambda { |level| return (level**2 * 50) + (level * 100) })
-			})
+			
 			
 			if map.respond_to?('stairs') && !map.stairs.nil? then			
 				if map.stairs.class.name != 'Array'			
@@ -197,6 +190,7 @@ module Hatchling
 			end
 			
 			# Draw last
+			@player.display = DisplayComponent.new(map.start_x.to_i, map.start_y.to_i, '@', Color.new(255, 192, 32))			
 			entities << @player
 			
 			return entities
@@ -247,5 +241,15 @@ module Hatchling
 			srand(@seed)
 			Logger.info("This is game ##{@seed}")
 		end
+	end
+	
+	def validate_player
+		p = @player
+		raise "Please specify a player entity with :player in the constructor" if p.nil?
+		raise "Please give the player :health => HealthComponent" if p.get(:health).nil?
+		raise "Please give the player :health => BattleComponent" if p.get(:battle).nil?
+		raise "Please give the player :experience => ExperienceComponent" if p.get(:experience).nil?
+		
+		p.name = 'Player' # needed to ID him		
 	end
 end
