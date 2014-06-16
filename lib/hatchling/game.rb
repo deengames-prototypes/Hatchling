@@ -21,10 +21,14 @@ module Hatchling
 		
 		def initialize(args = {})
 			@@instance = self
+			# Systems
 			@display = DisplaySystem.new
 			@input = InputSystem.new(Keys, @display)
 			@battle = BattleSystem.new
-			@systems = [@display, @input, @battle]
+			@on_step = OnStepEventSystem.new
+			
+			@systems = [@display, @input, @battle, @on_step]			
+			# Other stuff
 			@seed = args[:seed] unless args[:seed].nil?
 			@player = args[:player]
 			validate_player			
@@ -98,7 +102,7 @@ module Hatchling
 					@display.add_messages(battle_messages) unless battle_messages.nil?
 					@display.draw					
 					input = @input.get_and_process_input
-					
+					# Menus don't pass time
 					if input[:pass_time] == true then
 						battle_results = @battle.process(input)
 						battle_messages = battle_results[:messages]
@@ -111,6 +115,7 @@ module Hatchling
 						@entities.each do |e|
 							@entities.delete(e) if e.has?(:health) && !e.get(:health).is_alive?
 						end
+						@on_step.check_for_events
 					end
 					
 					quit = (input[:key] == 'q' || input[:key] == 'escape')
