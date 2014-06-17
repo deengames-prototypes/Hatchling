@@ -3,7 +3,7 @@ require_relative 'base_component'
 class BattleComponent < BaseComponent
 	attr_reader :strength, :speed
 	
-	def initialize(props)
+	def initialize(props, event_handlers = {})
 		validate(props[:strength], :strength)		
 		validate(props[:speed], :speed)
 				
@@ -16,6 +16,7 @@ class BattleComponent < BaseComponent
 		end
 		
 		@target = props[:target] if props.has_key?(:target)
+		@on_move = event_handlers[:on_move] unless event_handlers[:on_move].nil?		
 		
 		super()
 	end
@@ -39,6 +40,11 @@ class BattleComponent < BaseComponent
 		end
 				
 		return {:x => x, :y => y}
+	end
+	
+	# Event handler, triggered when entity actually moves
+	def on_move(move)		
+		@on_move.call(move) unless @on_move.nil?
 	end
 	
 	private

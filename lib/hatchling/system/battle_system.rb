@@ -34,7 +34,7 @@ class BattleSystem
 		
 		# Get all entities, who are not the player, who move, and are alive. Process their turns in order of speed (highest first).
 		movers = @entities.select { |e| e != @player && e.has?(:battle) && e.has?(:health) && e.get(:health).is_alive? }.sort_by { |e| e.get(:battle).speed }.reverse
-		movers.each do |e|
+		movers.each do |e|			
 			# We're not guaranteed a good move. Eg. you may be boxed in
 			# a corner and unable to get closer to the player.
 			move = e.get(:battle).pick_move
@@ -43,7 +43,8 @@ class BattleSystem
 				attacks << {:attacker => e, :target => @player}
 				regen_health = false # no regen if you were attacked	
 			elsif is_valid_move?(move) then					
-				e.get(:display).move(move)	
+				e.get(:display).move(move)				
+				e.get(:battle).on_move(move)
 			end
 		end
 		

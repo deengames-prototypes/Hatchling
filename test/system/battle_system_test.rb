@@ -9,7 +9,8 @@ class BattleSystemTest < Test::Unit::TestCase
 	def setup
 		@player = Hatchling::Entity.new({
 			:name => 'Player',
-			:display => DisplayComponent.new(5, 5, '@', nil)
+			:display => DisplayComponent.new(5, 5, '@', nil),
+			:health => HealthComponent.new(10)
 		})
 	end
 	
@@ -37,7 +38,7 @@ class BattleSystemTest < Test::Unit::TestCase
 	
 	def test_is_valid_move_returns_false_if_map_is_valid_move_returns_false
 		b = BattleSystem.new
-		b.init( [@player], {:current_map => FakeMap.new})
+		b.init( [@player], {:current_map => SolidMap.new})
 		assert_equal(false, b.is_valid_move?({ :x => 3, :y => 7 }))
 	end
 	
@@ -46,10 +47,39 @@ class BattleSystemTest < Test::Unit::TestCase
 		b.init( [@player], {})
 		assert_equal(false, b.is_valid_move?({ :x => 5, :y => 5 }))
 	end	
+	
+	def test_process_triggers_on_move_events_if_they_exist
+		target = Hatchling::Entity.new({:display => DisplayComponent.new(3, 3, '@', "red")})		
+		pass = false
+		
+		# Requirements for triggering on-move:
+		# 1) Battle component with on_move lambda
+		# 2) Health component + alive
+		me = Hatchling::Entity.new({
+			:display => DisplayComponent.new(2, 2, '@', "blue"),
+			:battle => BattleComponent.new(
+				{:strength => 1, :speed => 1, :target => target},
+				:on_move => lambda { |x| pass = true }),
+			:health => HealthComponent.new(10)
+		})
+		
+		b = BattleSystem.new
+		b.init( [target, me, @player], {:current_map => OpenMap.new})
+		b.process({:key => 'right'})
+		
+		assert_equal(true, pass)
+	end
+	
 end
 
-class FakeMap	
+class SolidMap	
 	def is_valid_move?(m)
 		return false
+	end
+end
+
+class OpenMap
+	def is_valid_move?(m)
+		return true
 	end
 end
