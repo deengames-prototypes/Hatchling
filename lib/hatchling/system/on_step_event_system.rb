@@ -23,7 +23,9 @@ class OnStepEventSystem
 			d = m.get(:display)
 			apply = events.find_all { |e| e.get(:display).x == d.x && e.get(:display).y == d.y }
 			apply.each do |event|
-				event.get(:on_step).interact(m)				
+				on_step = event.get(:on_step)
+				# Don't trigger on yourself!
+				on_step.interact(m) unless m == on_step.entity
 			end
 		end
 	end

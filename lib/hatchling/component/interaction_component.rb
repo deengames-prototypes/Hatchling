@@ -4,6 +4,7 @@ require_relative 'base_component'
 class InteractionComponent < BaseComponent	
 	
 	def initialize(action_lambda)
+		super()
 		@action_lambda = action_lambda
 	end
 	

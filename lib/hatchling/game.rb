@@ -1,6 +1,7 @@
 require_relative 'system/display_system'
 require_relative 'system/input_system'
 require_relative 'system/battle_system'
+require_relative 'system/on_step_event_system'
 require_relative 'io/audio_manager'
 require_relative 'io/keys'
 require_relative 'utils/color'
@@ -242,6 +243,10 @@ module Hatchling
 			@display.fill_screen('.', Color.new(128, 128, 128))
 		end
 		
+		def add_entity(e)
+			@entities << e			
+		end
+		
 		private
 		
 		def note_seed
@@ -249,15 +254,15 @@ module Hatchling
 			srand(@seed)
 			Logger.info("This is game ##{@seed}")
 		end
-	end
-	
-	def validate_player
-		p = @player
-		raise "Please specify a player entity with :player in the constructor" if p.nil?
-		raise "Please give the player :health => HealthComponent" if p.get(:health).nil?
-		raise "Please give the player :health => BattleComponent" if p.get(:battle).nil?
-		raise "Please give the player :experience => ExperienceComponent" if p.get(:experience).nil?
 		
-		p.name = 'Player' # needed to ID him		
+		def validate_player
+			p = @player
+			raise "Please specify a player entity with :player in the constructor" if p.nil?
+			raise "Please give the player :health => HealthComponent" if p.get(:health).nil?
+			raise "Please give the player :health => BattleComponent" if p.get(:battle).nil?
+			raise "Please give the player :experience => ExperienceComponent" if p.get(:experience).nil?
+			
+			p.name = 'Player' # needed to ID him		
+		end
 	end
 end

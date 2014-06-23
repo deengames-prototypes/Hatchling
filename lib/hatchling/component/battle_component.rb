@@ -16,8 +16,9 @@ class BattleComponent < BaseComponent
 		end
 		
 		@target = props[:target] if props.has_key?(:target)
-		@on_move = event_handlers[:on_move] unless event_handlers[:on_move].nil?		
 		
+		@before_move = event_handlers[:before_move] unless event_handlers[:before_move].nil?
+		@on_move = event_handlers[:on_move] unless event_handlers[:on_move].nil?
 		super()
 	end
 	
@@ -42,9 +43,17 @@ class BattleComponent < BaseComponent
 		return {:x => x, :y => y}
 	end
 	
-	# Event handler, triggered when entity actually moves
+	
+	# Event handlers
+	
+	# Triggered when entity actually moves; this exposes their new position
 	def on_move(move)		
 		@on_move.call(move) unless @on_move.nil?
+	end
+	
+	# Triggered right before an entity moves; this exposes their current position
+	def before_move(move)
+		@before_move.call(move) unless @before_move.nil?
 	end
 	
 	private

@@ -36,13 +36,13 @@ class DisplaySystem
 			end
 		end
 		
-		# Draw all entities that moved		
+		# Draw all entities that moved
 		@entities.each do |e|			
 			if e.has?(:display)				
 				d = e.get(:display)
 				draw = false
-				previous = nil
-				
+				previous = nil				
+
 				# Didn't draw you before?
 				draw = true if !@previous_state.has_key?(e)				
 				# Did you move?
@@ -62,7 +62,7 @@ class DisplaySystem
 						end
 					end
 					
-					draw_on_map(d.x, d.y, d.character, d.color)
+					draw_on_map(d.x, d.y, d.character, d.color)					
 					
 					@previous_state[e] = DisplayComponent.new(d.x, d.y, d.character, d.color)					
 				end
