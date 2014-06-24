@@ -33,6 +33,10 @@ module Hatchling
 			@seed = args[:seed] unless args[:seed].nil?
 			@player = args[:player]
 			validate_player			
+			
+			# Custom messages from consumers of the API
+			# eg. acid's damage message
+			@custom_messages = []
 		end
 		
 		def self.instance
@@ -82,7 +86,7 @@ module Hatchling
 				@display.draw_text((80 - game_data.name.length) / 2, 10, game_data.name.upcase, Color.new(255, 0, 0))
 				@display.draw_text((80 - 23) / 2, 12, 'Press any key to begin.', Color.new(255, 255, 255))				
 				AudioManager.new.play(game_data.titlescreen_audio) if !game_data.titlescreen_audio.nil?				
-				@input.get_input				
+				@input.get_input
 				
 				### Draw the story ###
 				if (!game_data.story.nil?) then
@@ -116,9 +120,12 @@ module Hatchling
 						@entities.each do |e|
 							@entities.delete(e) if e.has?(:health) && !e.get(:health).is_alive?
 						end
+						
 						@on_step.check_for_events
 					end
 					
+					battle_messages += @custom_messages
+					@custom_messages = []
 					quit = (input[:key] == 'q' || input[:key] == 'escape')
 				end
 				
@@ -245,6 +252,10 @@ module Hatchling
 		
 		def add_entity(e)
 			@entities << e			
+		end
+		
+		def add_message(m)
+			@custom_messages << m
 		end
 		
 		private

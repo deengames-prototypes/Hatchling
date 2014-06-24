@@ -87,6 +87,6 @@ class BattleComponent < BaseComponent
 	
 	def validate(field, name)		
 		raise "Invalid value of #{field} for #{name}; please specify an integer value" if field.class.name != 'Fixnum'
-		raise "#{name} (#{field}) must be positive" if field <= 0
+		raise "#{name} (#{field}) must be positive" if field <= 0 && name != :strength
 	end
 end
