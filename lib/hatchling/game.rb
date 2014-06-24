@@ -37,6 +37,8 @@ module Hatchling
 			# Custom messages from consumers of the API
 			# eg. acid's damage message
 			@custom_messages = []
+			# Custom systems from the consumer game
+			@custom_systems = []
 		end
 		
 		def self.instance
@@ -126,6 +128,8 @@ module Hatchling
 					
 					battle_messages += @custom_messages
 					@custom_messages = []
+					
+					@custom_systems.map { |s| s.after_moves if s.respond_to?(:after_moves) }
 					quit = (input[:key] == 'q' || input[:key] == 'escape')
 				end
 				
@@ -240,7 +244,7 @@ module Hatchling
 			@current_map.entities.uniq!
 			
 			# Pass entities to our systems	
-			@systems.each do |s|				
+			(@systems + @custom_systems).each do |s|				
 				s.init(@entities, { :current_map => @current_map })				
 			end
 			
@@ -254,8 +258,16 @@ module Hatchling
 			@entities << e			
 		end
 		
+		def remove_entity(e)
+			@entities.delete(e)
+		end
+		
 		def add_message(m)
 			@custom_messages << m
+		end
+		
+		def add_system(s)
+			@custom_systems << s
 		end
 		
 		private
