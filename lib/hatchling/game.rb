@@ -2,6 +2,7 @@ require_relative 'system/display_system'
 require_relative 'system/input_system'
 require_relative 'system/battle_system'
 require_relative 'system/on_step_event_system'
+require_relative 'system/effects_system'
 require_relative 'io/audio_manager'
 require_relative 'io/keys'
 require_relative 'utils/color'
@@ -27,8 +28,9 @@ module Hatchling
 			@input = InputSystem.new(Keys, @display)
 			@battle = BattleSystem.new
 			@on_step = OnStepEventSystem.new
+			@effects = EffectsSystem.new
 			
-			@systems = [@display, @input, @battle, @on_step]			
+			@systems = [@display, @input, @battle, @on_step, @effects]			
 			# Other stuff
 			@seed = args[:seed] unless args[:seed].nil?
 			@player = args[:player]
@@ -126,6 +128,7 @@ module Hatchling
 						@on_step.check_for_events
 					end
 					
+					@effects.decay_effects
 					battle_messages += @custom_messages
 					@custom_messages = []
 					
@@ -160,8 +163,6 @@ module Hatchling
 					entities << Entity.new({ :display => DisplayComponent.new(map.width - 1, y, '#', grey) })
 				end
 			end
-			
-			
 			
 			if map.respond_to?('stairs') && !map.stairs.nil? then			
 				if map.stairs.class.name != 'Array'			
