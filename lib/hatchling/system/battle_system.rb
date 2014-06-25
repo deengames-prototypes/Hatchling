@@ -41,6 +41,7 @@ class BattleSystem
 			
 			if player_at?(move) then					
 				attacks << {:attacker => e, :target => @player}
+				e.get(:battle).before_attack(@player)
 				regen_health = false # no regen if you were attacked	
 			elsif is_valid_move?(move) then
 				d = e.get(:display)

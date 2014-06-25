@@ -19,6 +19,7 @@ class BattleComponent < BaseComponent
 		
 		@before_move = event_handlers[:before_move] unless event_handlers[:before_move].nil?
 		@on_move = event_handlers[:on_move] unless event_handlers[:on_move].nil?
+		@before_attack = event_handlers[:before_attack] unless event_handlers[:before_attack].nil?
 		super()
 	end
 	
@@ -54,6 +55,11 @@ class BattleComponent < BaseComponent
 	# Triggered right before an entity moves; this exposes their current position
 	def before_move(move)
 		@before_move.call(move) unless @before_move.nil?
+	end
+	
+	# Right before you attack. Doesn't nullify your attack.
+	def before_attack(target)
+		@before_attack.call(target) unless @before_attack.nil?
 	end
 	
 	private

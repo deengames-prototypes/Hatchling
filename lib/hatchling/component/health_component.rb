@@ -4,7 +4,7 @@ require_relative '../system/event_system'
 class HealthComponent < BaseComponent
 	attr_reader :current_health, :max_health, :regen_percent
 	
-	def initialize(max_health, regen_percent = nil)
+	def initialize(max_health, regen_percent = nil, event_handlers = {})
 		validate(max_health)
 		@current_health = max_health
 		@max_health = max_health
@@ -18,7 +18,9 @@ class HealthComponent < BaseComponent
 				@current_health += healing			
 				@current_health = [@current_health, @max_health].min
 			end			
-		}) unless @regen_percent.nil?		
+		}) unless @regen_percent.nil?
+		
+		@on_death = event_handlers[:on_death] unless event_handlers[:on_death].nil?			
 	end
 	
 	def get_hurt(amount)
@@ -29,6 +31,11 @@ class HealthComponent < BaseComponent
 	
 	def is_alive?
 		return @current_health > 0
+	end
+	
+	# Event that's triggered when you die
+	def on_death		
+		@on_death.call unless @on_death.nil?		
 	end
 	
 	private

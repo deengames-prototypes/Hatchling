@@ -113,8 +113,11 @@ module Hatchling
 					input = @input.get_and_process_input
 					# Menus don't pass time
 					if input[:pass_time] == true then
+						was_alive = @entities.select { |e| e.has?(:health) && e.get(:health).is_alive? }
+						
 						battle_results = @battle.process(input)
 						battle_messages = battle_results[:messages]
+						
 						battler_results = battler.resolve_attacks(battle_results[:attacks])
 						
 						battler_results[:messages].each do |m|
@@ -122,7 +125,10 @@ module Hatchling
 						end
 						
 						@entities.each do |e|
-							@entities.delete(e) if e.has?(:health) && !e.get(:health).is_alive?
+							if e.has?(:health) && !e.get(:health).is_alive?
+								@entities.delete(e)
+								e.get(:health).on_death if was_alive.include?(e)
+							end
 						end
 						
 						@on_step.check_for_events
