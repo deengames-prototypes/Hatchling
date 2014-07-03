@@ -39,7 +39,7 @@ class BattleSystem
 			# a corner and unable to get closer to the player.
 			move = e.get(:battle).pick_move
 			
-			if player_at?(move) then					
+			if player_at?(move) then
 				attacks << {:attacker => e, :target => @player}
 				e.get(:battle).before_attack(@player)
 				regen_health = false # no regen if you were attacked	

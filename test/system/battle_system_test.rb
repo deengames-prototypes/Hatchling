@@ -28,8 +28,6 @@ class BattleSystemTest < Test::Unit::TestCase
 		assert_nothing_raised { BattleSystem.new.init([e, @player], {}) }
 	end
 	
-	# TODO: More testing. Events are coming, so wait for that.
-	
 	def test_is_valid_move_returns_true_for_empty_space
 		b = BattleSystem.new
 		b.init( [@player], {})
@@ -49,7 +47,7 @@ class BattleSystemTest < Test::Unit::TestCase
 	end	
 	
 	def test_process_triggers_on_move_events_if_they_exist
-		target = Hatchling::Entity.new({:display => DisplayComponent.new(3, 3, '@', "red")})		
+		target = Hatchling::Entity.new({:display => DisplayComponent.new(3, 3, '@', "red")})	
 		pass = false
 		
 		# Requirements for triggering on-move:
@@ -70,6 +68,58 @@ class BattleSystemTest < Test::Unit::TestCase
 		assert_equal(true, pass)
 	end
 	
+	def test_two_monsters_will_not_occupy_same_spot
+		# Map: @#dd
+		# Player doesn't move; both drones will occupy the same spot. 
+		# This is representative of production.
+		target = Hatchling::Entity.new({
+			:display => DisplayComponent.new(0, 0, '@', 'red'),
+			:name => 'Player',
+			:health => HealthComponent.new(10)
+		})
+		m1 = Hatchling::Entity.new({
+			:display => DisplayComponent.new(2, 0, '@', "blue"),
+			:battle => BattleComponent.new({:strength => 1, :speed => 1, :target => target}),
+			:health => HealthComponent.new(10)
+		})
+		m2 = Hatchling::Entity.new({
+			:display => DisplayComponent.new(3, 0, '@', "blue"),
+			:battle => BattleComponent.new({:strength => 1, :speed => 1, :target => target}),
+			:health => HealthComponent.new(10)
+		})
+		map = CustomMap.new(
+			[{:x => 1, :y => 0 }],
+			[target, m1, m2]
+		)
+		
+		# Is our map working as expected?
+		assert_equal(false, map.is_valid_move?({:x => 0, :y => 0}))
+		assert_equal(false, map.is_valid_move?({:x => 1, :y => 0}))
+		assert_equal(false, map.is_valid_move?({:x => 2, :y => 0}))
+		assert_equal(false, map.is_valid_move?({:x => 3, :y => 0}))
+		
+		b = BattleSystem.new
+		b.init( [target, m1, m2], {:current_map => map})
+		b.process({:key => 'right'}) # Tries to move, triggers time
+		
+		assert_equal(0, target.get(:display).x)
+		assert_equal(2, m1.get(:display).x)
+		assert_equal(3, m2.get(:display).x, "Second monster occupies the same spot as the first one")		
+	end
+	
+end
+
+class CustomMap
+	def initialize(solid_tiles, entities)
+		@solid_tiles = solid_tiles # hash of X, Y coordinates
+		entities.each do |e|
+			@solid_tiles << { :x => e.get(:display).x, :y => e.get(:display).y }
+		end
+	end
+	
+	def is_valid_move?(m)
+		return !@solid_tiles.include?(m)		
+	end
 end
 
 class SolidMap	
