@@ -14,14 +14,14 @@ class ModelTest < Test::Unit::TestCase
 	
 	def test_entity_accepts_new_components
 		e = Hatchling::Entity.new({})
-		e.power = 999
-		assert_equal(999, e.power)
+		e.add(:power, 999)
+		assert_equal(999, e.get(:power))
 		assert(e.has?(:power))
 	end
 	
-	def test_entity_raises_for_unknown_property
+	def test_entity_returns_nil_for_unknown_entities
 		e = Hatchling::Entity.new({})
-		assert_raise(RuntimeError) { e.speed }
+		assert_nil(e.get(:speed))
 	end
 	
 	def test_trigger_calls_receive_event_on_all_components		
