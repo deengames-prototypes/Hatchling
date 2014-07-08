@@ -3,7 +3,7 @@ class CharacterScreen
 	def initialize(display_system, input_system, entities)
 		@display_system = display_system
 		@input_system = input_system
-		@player = entities.find { |e| e.has?(:name) && e.name == 'Player' }
+		@player = entities.find { |e| e.has?(:name) && e.get(:name) == 'Player' }
 		raise 'Can\'t find player in display system' if @player.nil?
 	end
 	

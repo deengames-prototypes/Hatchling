@@ -9,13 +9,17 @@ require_relative '../component/base_component'
 class Hatchling::Entity 
 
 	def initialize(hash)
-		symbols_only = {}
+		@properties = {}
+			
 		hash.each do |k, v|
-			symbols_only[k.to_sym] = v
-			v.entity = self if v.is_a?(BaseComponent)			
-		end
-				
-		@properties = symbols_only
+			add(k, v)
+		end		
+	end
+	
+	def add(key, value)
+		key = normalize_key(key)
+		value.entity = self if value.is_a?(BaseComponent)
+		@properties[key] = value
 	end
 	
 	def has?(key)
@@ -26,22 +30,6 @@ class Hatchling::Entity
 	def get(key)
 		key = normalize_key(key)
 		return @properties[key]
-	end
-	
-	# Not 100% functional. If your entity has a display component, for
-	# example, you can write e.display instead of e.get(:display).
-	# Some cases fail; needs MOAR testing.
-	def method_missing(method, *args, &block)
-		key = normalize_key(method)
-		# Setter
-		if (key.to_s.end_with?('=')) then
-			real_key = key.to_s[0, key.length - 1]
-			@properties[normalize_key(real_key)] = args[0]
-		else
-		# Getter
-			return self.get(key) if self.has?(key)
-			raise "Can't find #{method} property on entity #{self}; key=#{key}"
-		end
 	end
 	
 	# Event-based messaging
@@ -58,6 +46,6 @@ class Hatchling::Entity
 	private
 	
 	def normalize_key(key)
-		key.to_sym
+		return key.is_a?(Symbol) ? key : key.to_sym
 	end
 end

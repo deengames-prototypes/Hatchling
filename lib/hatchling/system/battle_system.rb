@@ -12,7 +12,7 @@ class BattleSystem
 		# Copy/pasted from other systems.
 		# TODO: DRY please
 		@entities.each do |e|
-			if e.has?(:name) && e.name.downcase == 'player'
+			if e.has?(:name) && e.get(:name).downcase == 'player'
 				@player = e				
 				break
 			end			

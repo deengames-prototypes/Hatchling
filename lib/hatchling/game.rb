@@ -81,7 +81,7 @@ module Hatchling
 				
 				# Load the starting map.
 				@town = OpenStruct.new(JSON.parse(File.read("data/maps/#{game_data.starting_map}")))
-				@town.floor = 0
+				@town.floor = 3
 				change_map(@town)
 				@current_map = @town
 				@display.clear # change_map draws dots, but we can't init the display any later
@@ -214,7 +214,7 @@ module Hatchling
 			end
 			
 			# Draw last
-			@player.display = DisplayComponent.new(map.start_x.to_i, map.start_y.to_i, '@', Color.new(255, 192, 32))			
+			@player.add(:display, DisplayComponent.new(map.start_x.to_i, map.start_y.to_i, '@', Color.new(255, 192, 32)))
 			entities << @player
 			
 			return entities
@@ -292,7 +292,7 @@ module Hatchling
 			raise "Please give the player :health => BattleComponent" if p.get(:battle).nil?
 			raise "Please give the player :experience => ExperienceComponent" if p.get(:experience).nil?
 			
-			p.name = 'Player' # needed to ID him		
+			p.add(:name, 'Player') # needed to ID him		
 		end
 	end
 end

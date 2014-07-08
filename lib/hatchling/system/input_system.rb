@@ -16,7 +16,7 @@ class InputSystem
 	def init(entities, args)
 		@entities = entities
 		@entities.each do |e|
-			if e.has?(:name) && e.name.downcase == 'player'
+			if e.has?(:name) && e.get(:name).downcase == 'player'
 				@player = e
 				break
 			end			
@@ -84,7 +84,7 @@ class InputSystem
 		e = entity_at(target.x, target.y)
 		
 		# Nothing there or nothing solid (like stairs)
-		if e.nil? || (e.has?(:solid) && e.solid == false)
+		if e.nil? || (e.has?(:solid) && e.get(:solid) == false)
 			@player.get(:display).x = target.x
 			@player.get(:display).y = target.y			
 		end
