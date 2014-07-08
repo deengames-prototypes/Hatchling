@@ -21,6 +21,7 @@ class BattleSystem
 		raise 'Can\'t find player in entities. You need an entity with :name => "Player"' if @player.nil?
 	end
 
+	# Returns a set of messages to display, and attacks to play out.
 	def process(input)
 		messages = []
 		attacks = []
@@ -28,7 +29,7 @@ class BattleSystem
 		
 		# Player always goes first
 		if input.has_key?(:target) && ['up', 'right', 'down', 'left'].include?(input[:key])			
-			attacks << {:attacker => @player, :target => input[:target]} if input[:target].has?(:health)
+			attacks << {:attacker => @player, :target => input[:target]} if input[:target].has?(:health)			
 			regen_health = false # no regen if you attacked
 		end
 		
@@ -50,6 +51,13 @@ class BattleSystem
 				e.get(:display).move(move)				
 				e.get(:battle).on_move(move)
 			end
+		end		
+		
+		if @player.has?(:battle) then
+			b = @player.get(:battle)
+			# Not technically triggered on move, but close. Very close.
+			b.before_move(nil)
+			b.on_move(nil)
 		end
 		
 		EventSystem.trigger(:regen) if @player.get(:health).is_alive? && regen_health

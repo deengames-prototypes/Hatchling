@@ -47,6 +47,10 @@ class BattleComponent < BaseComponent
 	
 	# Event handlers
 	
+	def set_on_move(move)
+		@on_move = move
+	end
+	
 	# Triggered when entity actually moves; this exposes their new position
 	def on_move(move)		
 		@on_move.call(move) unless @on_move.nil?
