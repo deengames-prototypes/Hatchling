@@ -81,7 +81,7 @@ module Hatchling
 				
 				# Load the starting map.
 				@town = OpenStruct.new(JSON.parse(File.read("data/maps/#{game_data.starting_map}")))
-				@town.floor = 3
+				@town.floor = 1
 				change_map(@town)
 				@current_map = @town
 				@display.clear # change_map draws dots, but we can't init the display any later
