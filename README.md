@@ -9,7 +9,7 @@ Hatchling is a pure Ruby roguelike library. It provides some useful functionalit
 
 # Quick-Start Guide
 
-For a reference working game, please take a look at [Planetoid](https://github.com/deengames/Hatchling). If you want to contribute, please read the [[Contributer's Guide]].
+For a reference working game, please take a look at [Planetoid](https://github.com/deengames/Hatchling). If you want to contribute, please read the [Contributer's Guide wiki page](https://github.com/deengames/Hatchling/wiki/Contributer's-Guide).
 
 ## Entry Point and Starting Map
 
