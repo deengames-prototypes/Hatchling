@@ -51,10 +51,12 @@ These are used in systems, which encapsulate all of the default behaviour (more 
 
 Hatchling currently ships with the current components:
 
-- **DisplayComponent:** Contains a position (x/y) and appearance (character/color)
-- **InputComponent:** Can respond to keyboard input and call arbitrary code.
 - **BattleComponent:** Contains useful stats for combat (strength and speed, for example)
+- **DisplayComponent:** Contains a position (x/y) and appearance (character/color)
+- **ExperienceComponent:** Has a level, gains experience, and levels up based on a lambda function.
 - **HealthComponent:** Has maximum/current health statistics, and useful functions like `is_alive?`
+- **InputComponent:** Can respond to keyboard input and call arbitrary code.
+- **InteractionComponent:** Indicates an entity that can interact when the player walks into it; interaction is a lambda.
 
 Note: unlike other entity/component systems, components are actually *classes with their own functions.* This makes it easier to rebuild, reuse, and test components.
 
