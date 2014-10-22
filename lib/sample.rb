@@ -9,5 +9,11 @@ class DrawIoScreen < Screen
 end
 
 g = Game.new
-g.show_screen(DrawIoScreen)
+
+# Create by class
+#g.show_screen(DrawIoScreen)
+
+# Create by instance
+ g.show_screen(DrawIoScreen.new)
+
 g.start

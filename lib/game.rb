@@ -54,9 +54,16 @@ class Game
     end
   end
   
-  def show_screen(clazz)
+  def show_screen(instance_or_class, params = {})
+    params[:display] = @display if !params.key?(:display)
+    
     @current_screen.destroy unless @current_screen.nil? || !@current_screen.respond_to?(:destroy)
-    @current_screen = clazz.new(@display)
+    
+    if instance_or_class.class == Class
+      @current_screen = instance_or_class.new(params) 
+    else
+      @current_screen = instance_or_class # instance
+    end    
   end
   
   private

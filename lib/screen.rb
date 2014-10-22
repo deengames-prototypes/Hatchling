@@ -3,8 +3,9 @@ class Screen
 
   # Sets the display to draw to. This is required.
   # Classes are constructed automatically.
-  def initialize(display)
-    @display = display
+  def initialize(params = { })
+    params[:display] = Display.instance if !params.key?(:display)
+    @display = params[:display]
   end
   
   def process(input)
