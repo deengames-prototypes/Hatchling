@@ -11,6 +11,8 @@ require_relative('../linux/rgb_color_strategy')
 # their window to 100x30 even though we just need 80x24).
 class Display
 
+  @@instance = nil
+
 	def width
 		return 80
 	end
@@ -19,7 +21,14 @@ class Display
 		return 24
 	end
 	
+	def self.instance
+	  @@instance
+  end
+	
 	def initialize
+	  raise 'Multiple instances of Display created' unless @@instance.nil?
+	  
+	  @@instance = self
 		ENV['TERM'] = 'xterm-256color' # Helps Linux only
 		Curses.noecho # do not show typed keys
 		Curses.init_screen		
@@ -45,7 +54,7 @@ class Display
 	end
 	
 	# Color = { :r => red, :g => green, :b => blue }
-	def draw(x, y, text, color)
+	def draw(x, y, text, color = Color.new(192, 192, 192))
 		return if text.nil? || text.length == 0
 		raise "Can't draw #{text} at (#{x}, #{y}); invalid x coordinate" if x < 0 || x >= self.width
 		raise "Can't draw #{text} at (#{x}, #{y}); invalid y coordinate" if y < 0 || y >= self.height

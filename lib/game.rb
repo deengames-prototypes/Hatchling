@@ -12,7 +12,8 @@ class Game
 
   attr_reader :current_map, :display, :input
   
-  @@instance = nil  
+  @@instance = nil
+  @current_screen = nil
   
   def initialize(args = {})
     raise 'Multiple instances of Game constructed' if !@@instance.nil?
@@ -38,10 +39,12 @@ class Game
       user_input = nil
       quit = false
       
+      raise 'Call show(screen) before calling start' if @current_screen.nil?
+      
       while (!quit) do          
         user_input = @input.read_character
-        display.draw(0, 0, user_input, Color.new(255, 255, 255))
-        quit = (user_input == 'q' || user_input == 'escape')
+        @current_screen.process(user_input)
+        quit = @current_screen.quit?
       end
       
       Logger.info('Normal termination')
@@ -49,7 +52,12 @@ class Game
       Logger.info("Termination by error: #{e}\n#{e.backtrace}") unless !setup_logger        
       raise # Re-raise after cleaning up
     end
-  end    
+  end
+  
+  def show_screen(clazz)
+    @current_screen.destroy unless @current_screen.nil? || !@current_screen.respond_to?(:destroy)
+    @current_screen = clazz.new(@display)
+  end
   
   private
   
