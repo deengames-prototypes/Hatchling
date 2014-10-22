@@ -65,6 +65,24 @@ class Display
 	def update
 		Curses.refresh
 	end
+	
+	##### Higher-level functions #####
+	
+	def clear
+		self.fill_screen(' ', Color.new(0, 0, 0))
+	end
+	
+	def fill_screen(character, color)
+		(0 .. self.width - 1).each do |x|
+			(0 .. self.height - 1).each do |y|
+				self.draw(x, y, character, color)
+			end
+		end
+		
+		self.update
+	end
+	
+	##### End higher-level functions #####
 
 	# Used by the Linux strategy to actually set the colour in the window
 	# TODO: maybe this can be a callback instead of an explicit method?
