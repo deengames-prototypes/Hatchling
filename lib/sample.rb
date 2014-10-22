@@ -14,6 +14,7 @@ g = Game.new
 #g.show_screen(DrawIoScreen)
 
 # Create by instance
- g.show_screen(DrawIoScreen.new)
+g.show_screen(DrawIoScreen.new)
+
 
 g.start
